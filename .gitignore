@@ -1,0 +1,4 @@
+# Visual Studio git ignore
+.vs/
+obj/
+bin/
