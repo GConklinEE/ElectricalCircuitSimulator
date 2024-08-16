@@ -3,19 +3,11 @@
   "WorkspaceRootPath": "C:\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{60B3546C-0895-4933-8814-8A95CCD9CE83}|ElectricalCircuitSimulator\\ElectricalCircuitSimulator.csproj|c:\\electricalcircuitsimulator\\electricalcircuitsimulator\\electricalcircuitsimulator\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{60B3546C-0895-4933-8814-8A95CCD9CE83}|ElectricalCircuitSimulator\\ElectricalCircuitSimulator.csproj|solutionrelative:electricalcircuitsimulator\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{60B3546C-0895-4933-8814-8A95CCD9CE83}|ElectricalCircuitSimulator\\ElectricalCircuitSimulator.csproj|c:\\electricalcircuitsimulator\\electricalcircuitsimulator\\electricalcircuitsimulator\\properties\\assemblyinfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{60B3546C-0895-4933-8814-8A95CCD9CE83}|ElectricalCircuitSimulator\\ElectricalCircuitSimulator.csproj|solutionrelative:electricalcircuitsimulator\\properties\\assemblyinfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{60B3546C-0895-4933-8814-8A95CCD9CE83}|ElectricalCircuitSimulator\\ElectricalCircuitSimulator.csproj|c:\\electricalcircuitsimulator\\electricalcircuitsimulator\\electricalcircuitsimulator\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{60B3546C-0895-4933-8814-8A95CCD9CE83}|ElectricalCircuitSimulator\\ElectricalCircuitSimulator.csproj|C:\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\electricalcircuitsimulator\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{60B3546C-0895-4933-8814-8A95CCD9CE83}|ElectricalCircuitSimulator\\ElectricalCircuitSimulator.csproj|solutionrelative:electricalcircuitsimulator\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{60B3546C-0895-4933-8814-8A95CCD9CE83}|ElectricalCircuitSimulator\\ElectricalCircuitSimulator.csproj|c:\\electricalcircuitsimulator\\electricalcircuitsimulator\\electricalcircuitsimulator\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{60B3546C-0895-4933-8814-8A95CCD9CE83}|ElectricalCircuitSimulator\\ElectricalCircuitSimulator.csproj|C:\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\electricalcircuitsimulator\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{60B3546C-0895-4933-8814-8A95CCD9CE83}|ElectricalCircuitSimulator\\ElectricalCircuitSimulator.csproj|solutionrelative:electricalcircuitsimulator\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     }
   ],
@@ -26,37 +18,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "App.config",
-              "DocumentMoniker": "C:\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\App.config",
-              "RelativeDocumentMoniker": "ElectricalCircuitSimulator\\App.config",
-              "ToolTip": "C:\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\App.config",
-              "RelativeToolTip": "ElectricalCircuitSimulator\\App.config",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
-              "WhenOpened": "2024-08-16T02:58:07.034Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "AssemblyInfo.cs",
-              "DocumentMoniker": "C:\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\Properties\\AssemblyInfo.cs",
-              "RelativeDocumentMoniker": "ElectricalCircuitSimulator\\Properties\\AssemblyInfo.cs",
-              "ToolTip": "C:\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\Properties\\AssemblyInfo.cs",
-              "RelativeToolTip": "ElectricalCircuitSimulator\\Properties\\AssemblyInfo.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAnAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-16T02:57:38.803Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "C:\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\MainWindow.xaml",
               "RelativeDocumentMoniker": "ElectricalCircuitSimulator\\MainWindow.xaml",
@@ -68,13 +34,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "C:\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "ElectricalCircuitSimulator\\MainWindow.xaml.cs",
-              "ToolTip": "C:\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\MainWindow.xaml.cs",
-              "RelativeToolTip": "ElectricalCircuitSimulator\\MainWindow.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAcAAAAAAAAAA==",
+              "ToolTip": "C:\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\ElectricalCircuitSimulator\\MainWindow.xaml.cs*",
+              "RelativeToolTip": "ElectricalCircuitSimulator\\MainWindow.xaml.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-08-16T02:56:18.004Z",
               "EditorCaption": ""
