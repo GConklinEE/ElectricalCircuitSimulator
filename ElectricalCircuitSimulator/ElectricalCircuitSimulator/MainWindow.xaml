@@ -1,0 +1,79 @@
+﻿<Window x:Class="ElectricalCircuitSimulator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ElectricalCircuitSimulator"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent"
+        BorderBrush="Transparent"
+        BorderThickness="1"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        Title="MainWindow" Height="810" Width="1440">
+    <Border CornerRadius="40" BorderBrush="#a8841e" BorderThickness="4" Background="#a8841e" MouseDown="Screen_MouseDown">
+        <Border CornerRadius="36" BorderBrush="#a8701e" BorderThickness="4" Background="#a8701e">
+            <Border CornerRadius="32" BorderBrush="#a8521e" BorderThickness="4" Background="#a8521e">
+                <Border CornerRadius="28" BorderBrush="#a83d1e" BorderThickness="4" Background="#a83d1e">
+                    <Border CornerRadius="24" BorderBrush="#a82b1e" BorderThickness="4" Background="#a82b1e">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <DockPanel Grid.Row="0" Background="Transparent" LastChildFill="False" Margin="0">
+                                <TextBlock Text="Electrical Circuit Simulator" FontStyle="Italic" Foreground="White" FontSize="48" FontWeight="Bold" Margin="20, 0, 0, 10" VerticalAlignment="Center"/>
+                                <Button Background="#ff9525" Content="X" Width="25" Height="25" Margin="0,0,20,0" VerticalAlignment="Center" DockPanel.Dock="Right" Click="CloseButton_Click" />
+                                <Button Background="#ff9525" Content="-" Width="25" Height="25" Margin="0,0,10,0" VerticalAlignment="Center" DockPanel.Dock="Right" Click="MinimizeButton_Click"/>
+                            </DockPanel>
+                            <!-- Main Content Area -->
+                            <Grid Grid.Row="1">
+                                <Border Background="White" CornerRadius="20" BorderBrush="White" BorderThickness="1" Padding="7">       
+                                    <StackPanel VerticalAlignment="Stretch" Background="White">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="350"/>
+                                                <RowDefinition Height="250"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="500"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Row="0" Name ="xCircuitImage" Padding="10, 10, 0, 0">
+                                            </Label>
+                                            <Grid Grid.Row="1">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Select a Circuit:" Margin="5, 15, 5, 5"></TextBlock>
+                                                <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" Margin="10,0,0,0">
+                                                    <ScrollViewer VerticalAlignment="Stretch">
+                                                        <StackPanel Background="LightGray" Name="xCircuitList"></StackPanel>
+                                                    </ScrollViewer>
+                                                </Border>
+                                            </Grid>
+                                            <DockPanel Grid.Row="2" Margin="0, 18, 0, 10">
+                                                <Button Name="xSimulateButton" FontSize="15" HorizontalAlignment="Right" Background="#ff9525" FontWeight="Bold" Content="Simulate Circuit" Width="150" Height="50" Margin="10,0,0,0" VerticalAlignment="Center" DockPanel.Dock="Right" Click="SimulateButton_Click"/>
+                                                <TextBlock Width="87" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Step Size (s):" Margin="12,10,0,10"></TextBlock>
+                                                <TextBox Name="xStepSizeTextBox" Width="80" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Center" Text="0.001" Margin="0,10,0,10" TextChanged="StepSizeTextBox_TextChanged"></TextBox>
+                                                <TextBlock Width="57" HorizontalAlignment="Left" FontSize="15" VerticalAlignment="Center" Text="# Steps:" Margin="20,10,0,10"></TextBlock>
+                                                <TextBox Name ="xStepNumTextBox" Width="80" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Center" Text="10" Margin="0,10,0,10" TextChanged="StepNumTextBox_TextChanged"></TextBox>
+                                            </DockPanel>
+                                            <!-- Plot view control for OxyPlot -->
+                                            <oxy:PlotView Grid.Column="1" Grid.Row="0" x:Name="xPlotView1" Height="320" Margin="10,10,10,0" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
+                                            <oxy:PlotView Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" x:Name="xPlotView2" Height="320" Margin="10,10,10,10" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+                                        </Grid>
+                                </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Border>
+            </Border>
+        </Border>
+    </Border>
+</Window>
