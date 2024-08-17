@@ -78,7 +78,7 @@ namespace ElectricalCircuitSimulator
 
             for (int i = 0; i < sfiles.Length; i++)
             {
-                Image oImage = new Image();
+                Image oImage = new Image();g
                 try
                 {
                     oImage.Source = new BitmapImage(new Uri(System.IO.Path.GetFullPath(System.IO.Path.ChangeExtension(sfiles[i], ".png"))));
