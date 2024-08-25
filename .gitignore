@@ -2,3 +2,5 @@
 .vs/
 obj/
 bin/
+x64/
+*.vcxproj.user
