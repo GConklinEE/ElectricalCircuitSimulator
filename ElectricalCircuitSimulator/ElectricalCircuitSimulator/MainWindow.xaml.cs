@@ -1,20 +1,12 @@
 ﻿using OxyPlot.Series;
-using OxyPlot.Wpf;
 using OxyPlot;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.IO;
 using System.Collections.ObjectModel;
@@ -29,6 +21,24 @@ namespace ElectricalCircuitSimulator
         #region Constructors
 
         public MainWindow()
+        {
+            m_bTestMode = false;
+            Setup();
+        }
+
+        public MainWindow(bool bTestMode) // Set to true if running this class in a unit testing framework
+        {
+            m_bTestMode = bTestMode;
+            Setup();
+        }
+
+        public MainWindow(int iValue) {} // Blank constructor for testing
+
+        #endregion
+
+        #region Functions
+
+        private void Setup()
         {
             InitializeComponent();
 
@@ -55,14 +65,10 @@ namespace ElectricalCircuitSimulator
             m_oTimer.Tick += Timer_Tick;
         }
 
-        #endregion
-
-        #region Functions
-
-        private void LoadCircuits ()
+        private void LoadCircuits()
         {
             // Go to the folder where circuit files and images are contained, and load them all
-            m_bErrorShown = false;
+            Image oBlankImage = new Image();
             string[] sfiles = new string[0];
             string sDirectoryPath = @"../../../../../Circuits";
             string sFileType = "*.txt";
@@ -71,9 +77,26 @@ namespace ElectricalCircuitSimulator
             {
                 sfiles = Directory.GetFiles(sDirectoryPath, sFileType, SearchOption.AllDirectories);
             }
-            catch 
+            catch
             {
-                MessageBox.Show("No circuit files found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (m_bTestMode == false) 
+                {
+                    MessageBox.Show("No circuit files found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                UI_Error = true;
+            }
+
+            try
+            {
+                oBlankImage.Source = new BitmapImage(new Uri(System.IO.Path.GetFullPath("../../../../../Circuits/Blank.png")));
+            }
+            catch
+            {
+                if (m_bTestMode == false)
+                {
+                    MessageBox.Show("No blank circuit image found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                UI_Error = true;
             }
 
             for (int i = 0; i < sfiles.Length; i++)
@@ -83,19 +106,10 @@ namespace ElectricalCircuitSimulator
                 {
                     oImage.Source = new BitmapImage(new Uri(System.IO.Path.GetFullPath(System.IO.Path.ChangeExtension(sfiles[i], ".png"))));
                 }
-                catch 
+                catch
                 {
-                    try
-                    {
-                        oImage.Source = new BitmapImage(new Uri(System.IO.Path.GetFullPath("../../../../../Circuits/Blank.png")));
-                    }
-                    catch
-                    {
-                        if (m_bErrorShown == false) {
-                            MessageBox.Show("No blank circuit image found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                        m_bErrorShown = true;
-                    }
+                    oImage = oBlankImage;
+                    UI_Error = true;
                 }
 
                 oImage.Width = 490;
@@ -105,7 +119,7 @@ namespace ElectricalCircuitSimulator
                 IndexTextBlock oTextBlock = new IndexTextBlock(i);
                 oTextBlock.Text = "Circuit " + (i + 1).ToString();
                 oTextBlock.FontSize = 15;
-                oTextBlock.Margin = new Thickness (4, 5, 5, 0);
+                oTextBlock.Margin = new Thickness(4, 5, 5, 0);
                 oTextBlock.Padding = new Thickness(10, 10, 10, 10);
                 oTextBlock.MouseLeftButtonDown += TextBox_MouseLeftButtonDown;
                 xCircuitList.Children.Add(oTextBlock);
@@ -116,13 +130,13 @@ namespace ElectricalCircuitSimulator
                     oTextBlock.Foreground = new SolidColorBrush(Colors.White);
                     m_oLastTextBlock = oTextBlock;
                     xCircuitImage.Content = oImage;
-                } else
+                }
+                else
                 {
                     oTextBlock.Background = new SolidColorBrush(Colors.White);
                     oTextBlock.Foreground = new SolidColorBrush(Colors.Black);
                 }
             }
-            m_bErrorShown = false;
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -151,7 +165,7 @@ namespace ElectricalCircuitSimulator
 
         #region Events
 
-        private void TextBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        public void TextBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             m_oLastTextBlock.Background = new SolidColorBrush(Colors.White);
             m_oLastTextBlock.Foreground = new SolidColorBrush(Colors.Black);
@@ -161,7 +175,7 @@ namespace ElectricalCircuitSimulator
             xCircuitImage.Content = m_oImages.ElementAt(m_oLastTextBlock.Index);
         }
 
-        private void StepSizeTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        public void StepSizeTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             double result;
             if (double.TryParse(xStepSizeTextBox.Text, out result))
@@ -175,14 +189,14 @@ namespace ElectricalCircuitSimulator
                     xStepSizeTextBox.Background = new SolidColorBrush(Colors.White);
                     m_dStepSize = result;
                 }
-            } 
-            else 
+            }
+            else
             {
                 xStepSizeTextBox.Background = new SolidColorBrush(Colors.Red);
             }
         }
 
-        private void StepNumTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        public void StepNumTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             int result;
             if (int.TryParse(xStepNumTextBox.Text, out result))
@@ -203,26 +217,35 @@ namespace ElectricalCircuitSimulator
             }
         }
 
-        private void Screen_MouseDown(object sender, MouseButtonEventArgs e)
+        public void Screen_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            MouseButtonState eMouseButtonState;
+            if (e is MouseButtonEventArgsTest)
+            {
+                eMouseButtonState = (e as MouseButtonEventArgsTest).LeftButton;
+            }
+            else
+            {
+                eMouseButtonState = e.LeftButton;
+            }
             // If the left mouse button is pressed, initiate window drag
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (eMouseButtonState == MouseButtonState.Pressed)
             {
                 this.DragMove();
             }
         }
 
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        public void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
         }
 
-        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        public void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
         }
 
-        private void SimulateButton_Click(object sender, RoutedEventArgs e)
+        public void SimulateButton_Click(object sender, RoutedEventArgs e)
         {
             if (m_oTimer.IsEnabled)
             {
@@ -240,9 +263,9 @@ namespace ElectricalCircuitSimulator
 
         #region Data Members
 
+        public bool m_bTestMode;
         private double m_dStepSize;
         private int m_iStepNum;
-        private bool m_bErrorShown;
         private LineSeries m_oLineSeries1;
         private LineSeries m_oLineSeries2;
         private PlotModel m_oPlotModel1;
@@ -252,6 +275,12 @@ namespace ElectricalCircuitSimulator
         private Collection<Image> m_oImages;
 
         #endregion
+
+        #region Properties
+
+        public bool UI_Error { get; private set; }
+
+        #endregion 
     }
 }
 
@@ -259,18 +288,39 @@ namespace ElectricalCircuitSimulator
 
 public class IndexTextBlock : TextBlock
 {
+    public IndexTextBlock() : base() { }
+
     public IndexTextBlock(int iIndex) : base()
     {
-        m_iIndex = iIndex;
+        Index = iIndex;
     }
 
-    public int Index
+    public int Index { get; set; }
+}
+
+public class MouseButtonEventArgsTest : MouseButtonEventArgs
+{
+    public MouseButtonEventArgsTest(MouseDevice oMouseDevice, MouseButton eButton, MouseButtonState eState)
+        : base(oMouseDevice, 0, eButton)
     {
-        get => m_iIndex;
-        set => m_iIndex = value;
+        switch (eButton)
+        {
+            case MouseButton.Left:
+                LeftButton = eState;
+                break;
+            case MouseButton.Right:
+                RightButton = eState;
+                break;
+            case MouseButton.Middle:
+            default:
+                MiddleButton = eState;
+                break;
+        }
     }
 
-    private int m_iIndex;
+    public new MouseButtonState LeftButton { get; set; }
+    public new MouseButtonState RightButton { get; set; }
+    public new MouseButtonState MiddleButton { get; set; }
 }
 
 #endregion
