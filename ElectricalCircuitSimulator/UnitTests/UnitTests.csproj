@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ElectricalCircuitSimulator\ElectricalCircuitSimulator.csproj" />
+    <ProjectReference Include="..\SimulationEngineWrapper\SimulationEngineWrapper.vcxproj" />
   </ItemGroup>
 
   <ItemGroup>
