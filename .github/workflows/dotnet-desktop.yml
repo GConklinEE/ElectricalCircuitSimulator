@@ -72,20 +72,33 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
+    # Update .NET workloads because Github says we should
+    #- name: Update .NET workloads
+    #  run: dotnet workload update
+
+    # Download and install Visual Studio Build Tools
+    - name: Install Visual Studio Build Tools
+      run: |
+        $url = "https://aka.ms/vs/17/release/vs_buildtools.exe"
+        $installerPath = "$env:USERPROFILE\vs_buildtools.exe"
+        Invoke-WebRequest -Uri $url -OutFile $installerPath
+        Start-Process -FilePath $installerPath -ArgumentList '--quiet --wait --norestart --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --add Microsoft.VisualStudio.Component.NetCore.BuildTools' -NoNewWindow -Wait
+        Remove-Item -Path $installerPath
+
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
-
-    # Execute all unit tests in the solution
-    - name: Execute unit tests
-      working-directory: ElectricalCircuitSimulator\UnitTests
-      run: dotnet test
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
+
+    # Execute all unit tests in the solution
+    - name: Execute unit tests
+      working-directory: ElectricalCircuitSimulator\UnitTests
+      run: dotnet test
 
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx

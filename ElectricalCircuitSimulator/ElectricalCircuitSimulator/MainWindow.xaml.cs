@@ -70,7 +70,7 @@ namespace ElectricalCircuitSimulator
             // Go to the folder where circuit files and images are contained, and load them all
             Image oBlankImage = new Image();
             string[] sfiles = new string[0];
-            string sDirectoryPath = @"../../../../../Circuits";
+            string sDirectoryPath = @"../../../../../../Circuits";
             string sFileType = "*.txt";
 
             try
@@ -88,7 +88,7 @@ namespace ElectricalCircuitSimulator
 
             try
             {
-                oBlankImage.Source = new BitmapImage(new Uri(System.IO.Path.GetFullPath("../../../../../Circuits/Blank.png")));
+                oBlankImage.Source = new BitmapImage(new Uri(System.IO.Path.GetFullPath("../../../../../../Circuits/Blank.png")));
             }
             catch
             {
