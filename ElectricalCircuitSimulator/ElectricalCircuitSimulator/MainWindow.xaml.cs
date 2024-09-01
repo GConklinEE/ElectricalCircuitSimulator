@@ -11,7 +11,7 @@ using System.Windows.Threading;
 using System.IO;
 using System.Collections.ObjectModel;
 
-namespace ElectricalCircuitSimulator
+namespace ElectricalCircuitSimulator 
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
