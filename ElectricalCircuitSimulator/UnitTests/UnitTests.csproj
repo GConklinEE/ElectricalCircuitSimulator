@@ -8,6 +8,7 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <OutputType>WinExe</OutputType>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ElectricalCircuitSimulator\ElectricalCircuitSimulator.csproj" />
+    <ProjectReference Include="..\SimulationEngineWrapper\SimulationEngineWrapper.vcxproj" />
   </ItemGroup>
 
   <ItemGroup>
