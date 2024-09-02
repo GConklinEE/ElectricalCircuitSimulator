@@ -56,9 +56,10 @@ jobs:
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
     env:
+      # We are in a default location ElectricalCircuitSimulator\ElectricalCircuitSimulator already, which is the folder with the .github directory in it, so everything is relative to that.
       Solution_Name: ElectricalCircuitSimulator\ElectricalCircuitSimulator.sln             # Replace with your solution name, i.e. MyWpfApp.sln.
       Wap_Project_Directory: ElectricalCircuitSimulator                                    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      Wap_Project_Path: ElectricalCircuitSimulator\ElectricalCircuitSimulator              # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj would have a path of MyWpf.App.Package.
+      Wap_Project_Path: ElectricalCircuitSimulator\ElectricalCircuitSimulator.sln          # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj or MyWpf.App.Package\MyWpfApp.Package.wapsln
 
     steps:
     - name: Checkout
@@ -77,15 +78,11 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
+    # Nothing is being compiled here!
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
-
-    # Execute all unit tests in the solution
-    # - name: Execute unit tests
-    #   working-directory: ElectricalCircuitSimulator\UnitTests
-    #   run: dotnet test
 
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx
@@ -95,12 +92,20 @@ jobs:
         [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
 
     # Create the app package by building and packaging the Windows Application Packaging project
+    # This is where everything is actually compiled.
     - name: Create the app package
       run: msbuild $env:Wap_Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
       env:
         Appx_Bundle: Always
-        Appx_Bundle_Platforms: x86|x64
+        Appx_Bundle_Platforms: x64
         Appx_Package_Build_Mode: StoreUpload
+        Configuration: ${{ matrix.configuration }}
+
+    # Execute all unit tests in the solution. Need to run after compilation so we don't need to rebuild everything.
+    - name: Execute unit tests
+      working-directory: ElectricalCircuitSimulator\UnitTests
+      run: dotnet test "bin\x64\${{ env.Configuration }}\net8.0-windows\UnitTests.dll"
+      env:
         Configuration: ${{ matrix.configuration }}
 
     # Remove the pfx
@@ -108,8 +113,8 @@ jobs:
       run: Remove-Item -path $env:Wap_Project_Directory\GitHubActionsWorkflow.pfx
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
-    #- name: Upload build artifacts
-    #  uses: actions/upload-artifact@v3
-    #  with:
-    #    name: MSIX Package
-    #    path: ${{ env.Wap_Project_Directory }}\AppPackages
+    # - name: Upload build artifacts
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: MSIX Package
+    #     path: ${{ env.Wap_Project_Directory }}\AppPackages
