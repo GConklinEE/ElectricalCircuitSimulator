@@ -27,19 +27,19 @@ namespace SimulationEngine {
 
 		private:
 
-			CircuitComponent** m_oCircuitComponents;
-			Matrix m_oConductanceMatrix;
-			Matrix m_oSourceVector;
-			Matrix m_oVoltageMatrix;
-			PLU_Factorization m_oPLU_Factorization;
+			CircuitComponent** m_pCircuitComponents;
+			Matrix* m_pConductanceMatrix;
+			Matrix* m_pSourceVector;
+			Matrix* m_pVoltageMatrix;
+			PLU_Factorization* m_pPLU_Factorization;
 			vector<int> m_oNodeList;
-			bool m_bHasGround;
 			int m_iMaxComponentCount;
 			int m_iComponentCount;
-			int m_iNodeCount;
+			int m_iMaxNode;
 			double m_dStopTime;
 			double m_dTimeStep;
 			double m_dTime;
+			bool m_bHasGround;
 			bool m_bInitSim;
 			bool m_bRunSim;
 	};

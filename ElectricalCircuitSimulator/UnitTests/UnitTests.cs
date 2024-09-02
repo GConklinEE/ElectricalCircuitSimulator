@@ -6,7 +6,41 @@ using SimulationEngineWrapper;
 
 namespace UnitTests
 {
-    #region Test UI
+    #region Helper Functions
+
+    public class AssertAction() {
+        public static void VerifyAssert(Action oAction, string sFailMessage)
+        {
+            bool bSuccess = false;
+
+            try
+            {
+                oAction();
+                bSuccess = true;
+            }
+            catch
+            { }
+            finally
+            {
+                if (bSuccess == true)
+                {
+                    Assert.Fail(sFailMessage);
+                }
+            }
+        }
+
+        public static void CheckAssert(Action oAction, string sFailMessage)
+        {
+            try
+            {
+                oAction();
+            }
+            catch
+            {
+                Assert.Fail(sFailMessage);
+            }
+        }
+    }
 
     public class STATestMethod : TestMethodAttribute
     {
@@ -29,6 +63,10 @@ namespace UnitTests
         }
     }
 
+    #endregion
+
+    #region Test UI
+
     [TestClass]
     public class TestMainWindow
     {
@@ -47,148 +85,50 @@ namespace UnitTests
 
             const int iFilesLoaded = 5;
             int iIndex = iFilesLoaded;
-            bool bSuccess = false;
 
             Assert.IsTrue(oIndexTextBlock.Index == 0, "Index property returned unexpected value after being configured with blank constructor!");
-            try
-            {
-                oIndexTextBlock = new IndexTextBlock(iIndex);
-            }
-            catch
-            {
-                Assert.Fail("Failed to instatiate IndexTextBlock!");
-            }
+            oIndexTextBlock = new IndexTextBlock(iIndex);
             Assert.IsTrue(oIndexTextBlock.Index == iIndex, "Index property returned unexpected value after being configured with constructor!");
             iIndex++;
             oIndexTextBlock.Index = iIndex;
             Assert.IsTrue(oIndexTextBlock.Index == iIndex, "Index property returned unexpected value after being configured with property set method!");
 
-            try
-            {
-                oMainWindow = new MainWindow(true);
-            }
-            catch
-            {
-                Assert.Fail("Failed to instatiate MainWindow!");
-            }
-            finally
-            {
-                if ((oMainWindow != null) && (oMainWindow.UI_Error))
+            oMainWindow = new MainWindow(true);
+            if (oMainWindow != null) {
+                if (oMainWindow.UI_Error)
                 {
                     Assert.Fail("UI error in MainWindow!");
                 }
-            }
 
-            try
-            {
                 oIndexTextBlock.Index = 2;
-                oMainWindow.TextBox_MouseLeftButtonDown(oIndexTextBlock, oMouseButtonEventArgsTest);
-            }
-            catch
-            {
-                Assert.Fail("Failed to run TextBox_MouseLeftButtonDown!");
-            }
+                AssertAction.CheckAssert(() => oMainWindow.TextBox_MouseLeftButtonDown(oIndexTextBlock, oMouseButtonEventArgsTest), "Failed to run TextBox_MouseLeftButtonDown!");
 
-            try
-            {
-                bSuccess = false;
                 oIndexTextBlock.Index = iFilesLoaded;
-                oMainWindow.TextBox_MouseLeftButtonDown(oIndexTextBlock, oMouseButtonEventArgsTest);
-                bSuccess = true;
-            }
-            catch
-            {}
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Loaded more files than expected!");
-                }
-            }
-
-            try
-            {
-                bSuccess = false;
+                AssertAction.VerifyAssert(() => oMainWindow.TextBox_MouseLeftButtonDown(oIndexTextBlock, oMouseButtonEventArgsTest), "Loaded more files than expected!");
                 oIndexTextBlock.Index = iFilesLoaded - 1;
-                oMainWindow.TextBox_MouseLeftButtonDown(oIndexTextBlock, oMouseButtonEventArgsTest);
-                bSuccess = true;
-            }
-            catch
-            {
-                Assert.Fail("Loaded less files than expected!");
-            }
+                AssertAction.CheckAssert(() => oMainWindow.TextBox_MouseLeftButtonDown(oIndexTextBlock, oMouseButtonEventArgsTest), "Loaded less files than expected!");
 
-            try
-            {
                 oTextBox.Text = "5";
-                oMainWindow.StepSizeTextBox_TextChanged(oTextBox, oTextChangedEventArgs);
+                AssertAction.CheckAssert(() => oMainWindow.StepSizeTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepSizeTextBox_TextChanged!");
                 oTextBox.Text = "-1";
-                oMainWindow.StepSizeTextBox_TextChanged(oTextBox, oTextChangedEventArgs);
+                AssertAction.CheckAssert(() => oMainWindow.StepSizeTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepSizeTextBox_TextChanged!");
                 oTextBox.Text = "A";
-                oMainWindow.StepSizeTextBox_TextChanged(oTextBox, oTextChangedEventArgs);
-            }
-            catch
-            {
-                Assert.Fail("Failed to run StepSizeTextBox_TextChanged!");
-            }
+                AssertAction.CheckAssert(() => oMainWindow.StepSizeTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepSizeTextBox_TextChanged!");
 
-            try
-            {
                 oTextBox.Text = "5";
-                oMainWindow.StepNumTextBox_TextChanged(oTextBox, oTextChangedEventArgs);
+                AssertAction.CheckAssert(() => oMainWindow.StepNumTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepNumTextBox_TextChanged!");
                 oTextBox.Text = "-1";
-                oMainWindow.StepNumTextBox_TextChanged(oTextBox, oTextChangedEventArgs);
+                AssertAction.CheckAssert(() => oMainWindow.StepNumTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepNumTextBox_TextChanged!");
                 oTextBox.Text = "A";
-                oMainWindow.StepNumTextBox_TextChanged(oTextBox, oTextChangedEventArgs);
-            }
-            catch
-            {
-                Assert.Fail("Failed to run StepNumTextBox_TextChanged!");
-            }
+                AssertAction.CheckAssert(() => oMainWindow.StepNumTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepNumTextBox_TextChanged!");
 
-            try
-            {
-                oMainWindow.Screen_MouseDown(oIndexTextBlock, oMouseButtonEventArgsTest);
-            }
-            catch
-            {
-                Assert.Fail("Failed to run Screen_MouseDown!");
-            }
+                AssertAction.CheckAssert(() => oMainWindow.Screen_MouseDown(oIndexTextBlock, oMouseButtonEventArgsTest), "Failed to run Screen_MouseDown!");
+                AssertAction.VerifyAssert(() => oMainWindow.CloseButton_Click(oButton, oRoutedEventArgs), "Expected running CloseButton_Click to fail, it did not!");
+                AssertAction.CheckAssert(() => oMainWindow.MinimizeButton_Click(oButton, oRoutedEventArgs), "Failed to run MinimizeButton_Click!");
 
-            try
-            {
-                bSuccess = false;
-                oMainWindow.CloseButton_Click(oButton, oRoutedEventArgs);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected running CloseButton_Click to fail, it did not!");
-                }
-            }
-
-            try
-            {
-                oMainWindow.MinimizeButton_Click(oButton, oRoutedEventArgs);
-            }
-            catch
-            {
-                Assert.Fail("Failed to run MinimizeButton_Click!");
-            }
-
-            try
-            {
                 // Event toggles states, so call it twice
-                oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs);
-                oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs);
-            }
-            catch
-            {
-                Assert.Fail("Failed to run SimulateButton_Click!");
+                AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
+                AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
             }
         }
     }
@@ -205,134 +145,22 @@ namespace UnitTests
         {
             int iRow;
             int iColumn;
-            bool bSuccess = false;
 
             Matrix oMatrix = new Matrix();
             oMatrix = new Matrix(2, 6);
-            try
-            {
-                bSuccess = false;
-                oMatrix = new Matrix(0, 5);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oMatrix = new Matrix(6, 0);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oMatrix = new Matrix(-6, 6);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oMatrix = new Matrix(6, -6);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
+            AssertAction.VerifyAssert(() => oMatrix = new Matrix(0, 5), "Expected 'Matrix dimensions must be positive and non-zero!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oMatrix = new Matrix(6, 0), "Expected 'Matrix dimensions must be positive and non-zero!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oMatrix = new Matrix(-6, 6), "Expected 'Matrix dimensions must be positive and non-zero!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oMatrix = new Matrix(6, -6), "Expected 'Matrix dimensions must be positive and non-zero!' error, did not get it!");
+
             oMatrix = new Matrix(5, 5);
-            Assert.IsTrue(oMatrix.getNumRows() == 5, "Incorrect matrix row count! Expected 5");
-            Assert.IsTrue(oMatrix.getNumColumns() == 5, "Incorrect matrix column count! Expected 5");
+            Assert.IsTrue(oMatrix.getNumRows() == 5, "Expected 'Incorrect matrix row count! Expected 5' did not get it!");
+            Assert.IsTrue(oMatrix.getNumColumns() == 5, "Expected 'Incorrect matrix column count! Expected 5' did not get it!");
             oMatrix.printMatrix();
-            try
-            {
-                bSuccess = false;
-                oMatrix.setValue(3, 5, 11);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oMatrix.setValue(5, 3, 11);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oMatrix.getValue(3, 5);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oMatrix.getValue(5, 3);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
+            AssertAction.VerifyAssert(() => oMatrix.setValue(3, 5, 11), "Expected 'Location beyond dimensions of matrix!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oMatrix.setValue(5, 3, 11), "Expected 'Location beyond dimensions of matrix!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oMatrix.getValue(3, 5), "Expected 'Location beyond dimensions of matrix!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oMatrix.getValue(5, 3), "Expected 'Location beyond dimensions of matrix!' error, did not get it!");
             oMatrix.setValue(2, 3, 11);
             Assert.IsTrue((int)Math.Round(oMatrix.getValue(2, 3)) == 11, "Incorrect matrix value! Expected 11");
             for (iRow = 0; iRow < oMatrix.getNumRows(); iRow++)
@@ -364,310 +192,103 @@ namespace UnitTests
         public void TestPLU_Factorization()
         {
             PLU_Factorization oPLU_Factorization = new PLU_Factorization();
+            oPLU_Factorization = new PLU_Factorization(); // Check for memory access problems
+            oPLU_Factorization.Dispose();
         }
 
         [TestMethod]
         public void TestCircuitComponent()
         {
-            bool bSuccess = false;
             CircuitComponent oCircuitComponent;
-            try
-            {
-                bSuccess = false;
-                oCircuitComponent = new CircuitComponent(5, 5, false);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oCircuitComponent = new CircuitComponent(0, -6, false);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oCircuitComponent = new CircuitComponent(-5, 6, false);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
+
+            AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(5, 5, false), "Expected 'Node values must not be the same!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(0, -6, false), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(-5, 6, false), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
+
             oCircuitComponent = new CircuitComponent(0, 5, false);
             Assert.IsTrue(oCircuitComponent.getIsGround() == false, "Incorrect value! Expected false");
             Assert.IsTrue(oCircuitComponent.getNodeS() == 0, "Incorrect value! Expected 0");
             Assert.IsTrue(oCircuitComponent.getNodeD() == 5, "Incorrect value! Expected 5");
             Assert.IsTrue(oCircuitComponent.getCurrent() == 0, "Incorrect value! Expected 0");
+
+            oCircuitComponent = new CircuitComponent(2, 7, true); // Check for memory access problems
         }
 
         [TestMethod]
         public void TestCapacitor()
         {
-            bool bSuccess = false;
-
             Capacitor oCapacitor = new Capacitor(1, 2, 7);
-            try
-            {
-                bSuccess = false;
-                oCapacitor = new Capacitor(1, 2, -7);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
+            oCapacitor = new Capacitor(0, 2, 4);  // Check for memory access problems
+            AssertAction.VerifyAssert(() => oCapacitor = new Capacitor(1, 2, -7), "Expected 'Capacitance value must be greater than 0!' error, did not get it!");
         }
 
         [TestMethod]
         public void TestInductor()
         {
-            bool bSuccess = false;
-
             Inductor oInductor = new Inductor(1, 2, 7);
-            try
-            {
-                bSuccess = false;
-                oInductor = new Inductor(1, 2, -7);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
+            oInductor = new Inductor(0, 2, 4);  // Check for memory access problems
+            AssertAction.VerifyAssert(() => oInductor = new Inductor(1, 2, -7), "Expected 'Inductance value must be greater than 0!' error, did not get it!");
         }
 
         [TestMethod]
         public void TestResistor()
         {
-            bool bSuccess = false;
-
             Resistor oResistor = new Resistor(1, 2, 10);
-            try
-            {
-                bSuccess = false;
-                oResistor = new Resistor(1, 2, -10);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
+            oResistor = new Resistor(0, 2, 4);  // Check for memory access problems
+            AssertAction.VerifyAssert(() => new Resistor(1, 2, -10), "Expected 'Resistance value must be greater than 0!' error, did not get it!");
         }
 
         [TestMethod]
         public void TestGroundedVoltageSource()
         {
-            bool bSuccess = false;
-
             GroundedVoltageSource oGroundedVoltageSource = new GroundedVoltageSource(1, 2, 7, 10);
-            try
-            {
-                bSuccess = false;
-                oGroundedVoltageSource = new GroundedVoltageSource(1, 2, -7, 10);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oGroundedVoltageSource = new GroundedVoltageSource(1, 2, 7, -10);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
+            oGroundedVoltageSource = new GroundedVoltageSource(0, 2, 4, 4);  // Check for memory access problems
+            AssertAction.VerifyAssert(() => oGroundedVoltageSource = new GroundedVoltageSource(1, 2, -7, 10), "Expected 'Voltage value must be greater than 0!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oGroundedVoltageSource = new GroundedVoltageSource(1, 2, 7, -10), "Expected 'Resistance value must be greater than 0!' error, did not get it!");
         }
 
         [TestMethod]
         public void TestLinearCircuit()
         {
             bool bDone = false;
-            bool bSuccess = false;
             LinearCircuit oLinearCircuit = new LinearCircuit(4);
-
             oLinearCircuit.addGroundedVoltageSource(1, 2, 30, 10);
             oLinearCircuit.addCapacitor(1, 0, 10);
             oLinearCircuit.addResistor(3, 2, 10);
-            try
-            {
-                bSuccess = false;
-                oLinearCircuit.addGroundedVoltageSource(1, 2, 30, 10);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            oLinearCircuit.addInductor(5, 2, 10);
-            try
-            {
-                bSuccess = false;
-                oLinearCircuit.addInductor(5, 2, 10);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
+            AssertAction.VerifyAssert(() => oLinearCircuit.addGroundedVoltageSource(1, 2, 30, 10), "Expected 'Circuit already has a ground, cannot add another one!' error, did not get it!");
+            oLinearCircuit.addInductor(4, 2, 10);
+            AssertAction.VerifyAssert(() => oLinearCircuit.addInductor(5, 2, 10), "Expected 'Circuit is already full of components!' error, did not get it!");
             oLinearCircuit.setStopTime(10);
-            try
-            {
-                bSuccess = false;
-                oLinearCircuit.setStopTime(0);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
+            AssertAction.VerifyAssert(() => oLinearCircuit.setStopTime(0), "Expected 'Stop time must be greater than 0!' error, did not get it!");
             oLinearCircuit.setTimeStep(1);
-            try
-            {
-                bSuccess = false;
-                oLinearCircuit.setTimeStep(0);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
+            AssertAction.VerifyAssert(() => oLinearCircuit.setTimeStep(0), "Expected 'Time step must be greater than 0!' error, did not get it!");
             Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 0, "Incorrect time! Expected 0");
-            try
-            {
-                bSuccess = false;
-                oLinearCircuit.getVoltage(2);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oLinearCircuit.getVoltage(7);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oLinearCircuit.getCurrent(0);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            try
-            {
-                bSuccess = false;
-                oLinearCircuit.getCurrent(8);
-                bSuccess = true;
-            }
-            catch
-            { }
-            finally
-            {
-                if (bSuccess == true)
-                {
-                    Assert.Fail("Expected error, did not get it!");
-                }
-            }
-            //oLinearCircuit.initalize();
-            //oLinearCircuit.step();
+            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(0), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(7), "Expected 'Requested node does not exist!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(2), "Expected 'Cannot read voltages from a circuit that has not been simulated!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.getCurrent(8), "Expected 'Requested component does not exist!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.getCurrent(0), "Expected 'Cannot read currents from a circuit that has not been simulated!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.step(), "Expected 'Circuit has not been initalized!' error, did not get it!");
+            oLinearCircuit.initalize();
+            bDone = oLinearCircuit.step();
+            Assert.IsTrue(bDone == false, "Simulation is not supposed to be done on the first step!");
 
-            //oLinearCircuit.Dispose();
+            AssertAction.VerifyAssert(() => new LinearCircuit(-5), "Expected 'Circuit must have a positive and non-zero number of components!' error, did not get it!");
+            AssertAction.VerifyAssert(() => new LinearCircuit(0), "Expected 'Circuit must have a positive and non-zero number of components!' error, did not get it!");
+            oLinearCircuit = new LinearCircuit(4);
+            oLinearCircuit.setStopTime(10);
+            oLinearCircuit.setTimeStep(1);
+            AssertAction.VerifyAssert(() => oLinearCircuit.initalize(), "Expected 'There are no components in the circuit!' error, did not get it!");
+            oLinearCircuit.addResistor(0, 1, 10);
+            AssertAction.VerifyAssert(() => oLinearCircuit.initalize(), "Expected 'There is no ground in the circuit!' error, did not get it!");
+            oLinearCircuit.addGroundedVoltageSource(0, 2, 10, 10);
+            oLinearCircuit.setTimeStep(11);
+            AssertAction.VerifyAssert(() => oLinearCircuit.initalize(), "Expected 'Stop time cannot be smaller than time step!' error, did not get it!");
+            oLinearCircuit.setTimeStep(1);
+            oLinearCircuit.addResistor(0, 6, 10);
+            AssertAction.VerifyAssert(() => oLinearCircuit.initalize(), "Expected 'Circuit nodes are not condensed into the smallest matrix possible!' error, did not get it!");
+
+            oLinearCircuit.Dispose();
         }
     }
 

@@ -18,7 +18,7 @@ namespace SimulationEngineWrapper {
 
         public:
 
-            ManagedObject(T* oInstance) : m_pInstance(oInstance) {
+            ManagedObject(T* pInstance) : m_pInstance(pInstance) {
                 ;
             }
 
@@ -137,25 +137,21 @@ namespace SimulationEngineWrapper {
             LinearCircuit(const int iNumComponents)
             : ManagedObject(new SimulationEngine::LinearCircuit(iNumComponents)) { ; }
 
-            ~LinearCircuit() {
-                m_pInstance->~LinearCircuit();
-            }
-
             int addResistor(const int iNodeS, const int iNodeD, const double dResistance) {
-                SimulationEngine::Resistor oResistor = SimulationEngine::Resistor(iNodeS, iNodeD, dResistance);
-                return m_pInstance->addComponent(&oResistor);
+                SimulationEngine::Resistor* pResistor = new SimulationEngine::Resistor(iNodeS, iNodeD, dResistance);
+                return m_pInstance->addComponent(pResistor);
             }
             int addInductor(const int iNodeS, const int iNodeD, const double dInductance) {
-                SimulationEngine::Inductor oInductor = SimulationEngine::Inductor(iNodeS, iNodeD, dInductance);
-                return m_pInstance->addComponent(&oInductor);
+                SimulationEngine::Inductor* pInductor = new SimulationEngine::Inductor(iNodeS, iNodeD, dInductance);
+                return m_pInstance->addComponent(pInductor);
             }
             int addCapacitor(const int iNodeS, const int iNodeD, const double dCapacitance) {
-                SimulationEngine::Capacitor oCapacitor = SimulationEngine::Capacitor(iNodeS, iNodeD, dCapacitance);
-                return m_pInstance->addComponent(&oCapacitor);
+                SimulationEngine::Capacitor* pCapacitor = new::Capacitor(iNodeS, iNodeD, dCapacitance);
+                return m_pInstance->addComponent(pCapacitor);
             }
             int addGroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance) {
-                SimulationEngine::GroundedVoltageSource oGroundedVoltageSource = SimulationEngine::GroundedVoltageSource(iNodeS, iNodeD, dVoltage, dResistance);
-                return m_pInstance->addComponent(&oGroundedVoltageSource);
+                SimulationEngine::GroundedVoltageSource* pGroundedVoltageSource = new SimulationEngine::GroundedVoltageSource(iNodeS, iNodeD, dVoltage, dResistance);
+                return m_pInstance->addComponent(pGroundedVoltageSource);
             }
             void setStopTime(const double dStopTime) {
                 m_pInstance->setStopTime(dStopTime);
