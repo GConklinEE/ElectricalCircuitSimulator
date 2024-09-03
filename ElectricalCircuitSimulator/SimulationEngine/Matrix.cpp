@@ -82,8 +82,8 @@ namespace SimulationEngine {
 
 	// Function to perform PLU factorization with row and column pivoting
 	// Factors a matrix into P*A*Q = L*U, where P = Row Permutation Matrix, and Q = Column Permutation Matrix
-	PLU_Factorization Matrix::runPLU_Factorization() const {
-		PLU_Factorization oResults;
+	PLU_Factorization* Matrix::runPLU_Factorization() const {
+		PLU_Factorization* pResults = new PLU_Factorization();
 		double dMaxVal;
 		int iMaxRow;
 		int iMaxCol;
@@ -97,19 +97,19 @@ namespace SimulationEngine {
 		}
 
 		// Initialize P and Q as identity permutations (single column matrices)
-		oResults.m_pP = new Matrix(m_iNumRows, 1);
-		oResults.m_pQ = new Matrix(m_iNumRows, 1);
-		oResults.m_pL = new Matrix(m_iNumRows, m_iNumRows);
-		oResults.m_pU = clone(); // Initialize U to be a copy of A
+		pResults->m_pP = new Matrix(m_iNumRows, 1);
+		pResults->m_pQ = new Matrix(m_iNumRows, 1);
+		pResults->m_pL = new Matrix(m_iNumRows, m_iNumRows);
+		pResults->m_pU = clone(); // Initialize U to be a copy of A
 
 		// Initialize L to an idenity matrix
 		for (iI1 = 0; iI1 < m_iNumRows; ++iI1) {
-			oResults.m_pL->m_oMatrix[iI1][iI1] = 1.0;
+			pResults->m_pL->m_oMatrix[iI1][iI1] = 1.0;
 		}
 
 		for (iI1 = 0; iI1 < m_iNumRows; ++iI1) {
-			oResults.m_pP->m_oMatrix[iI1][0] = iI1;
-			oResults.m_pQ->m_oMatrix[iI1][0] = iI1;
+			pResults->m_pP->m_oMatrix[iI1][0] = iI1;
+			pResults->m_pQ->m_oMatrix[iI1][0] = iI1;
 		}
 
 		for (iI3 = 0; iI3 < m_iNumRows; ++iI3) {
@@ -119,8 +119,8 @@ namespace SimulationEngine {
 			iMaxCol = iI3;
 			for (iI1 = iI3; iI1 < m_iNumRows; ++iI1) {
 				for (iI2 = iI3; iI2 < m_iNumRows; ++iI2) {
-					if (fabs(oResults.m_pU->m_oMatrix[iI1][iI2]) > dMaxVal) {
-						dMaxVal = fabs(oResults.m_pU->m_oMatrix[iI1][iI2]);
+					if (fabs(pResults->m_pU->m_oMatrix[iI1][iI2]) > dMaxVal) {
+						dMaxVal = fabs(pResults->m_pU->m_oMatrix[iI1][iI2]);
 						iMaxRow = iI1;
 						iMaxCol = iI2;
 					}
@@ -128,34 +128,34 @@ namespace SimulationEngine {
 			}
 
 			// Swap rows in U to move the pivot to position (iI3, iI3)
-			swap(oResults.m_pU->m_oMatrix[iI3], oResults.m_pU->m_oMatrix[iMaxRow]);
-			swap(oResults.m_pP->m_oMatrix[iI3], oResults.m_pP->m_oMatrix[iMaxRow]);
+			swap(pResults->m_pU->m_oMatrix[iI3], pResults->m_pU->m_oMatrix[iMaxRow]);
+			swap(pResults->m_pP->m_oMatrix[iI3], pResults->m_pP->m_oMatrix[iMaxRow]);
 
 			// Swap columns in U to move the pivot to position (iI3, iI3)
 			for (iI1 = 0; iI1 < m_iNumRows; ++iI1) {
-				swap(oResults.m_pU->m_oMatrix[iI1][iI3], oResults.m_pU->m_oMatrix[iI1][iMaxCol]);
+				swap(pResults->m_pU->m_oMatrix[iI1][iI3], pResults->m_pU->m_oMatrix[iI1][iMaxCol]);
 			}
-			swap(oResults.m_pQ->m_oMatrix[iI3], oResults.m_pQ->m_oMatrix[iMaxCol]);
+			swap(pResults->m_pQ->m_oMatrix[iI3], pResults->m_pQ->m_oMatrix[iMaxCol]);
 
 			// Update L for the row swaps
 			for (iI1 = 0; iI1 < iI3; ++iI1) {
-				swap(oResults.m_pL->m_oMatrix[iI3][iI1], oResults.m_pL->m_oMatrix[iMaxRow][iI1]);
+				swap(pResults->m_pL->m_oMatrix[iI3][iI1], pResults->m_pL->m_oMatrix[iMaxRow][iI1]);
 			}
 
 			// Compute multipliers and update U
 			for (iI1 = iI3 + 1; iI1 < m_iNumRows; ++iI1) {
-				oResults.m_pL->m_oMatrix[iI1][iI3] = oResults.m_pU->m_oMatrix[iI1][iI3] / oResults.m_pU->m_oMatrix[iI3][iI3];
+				pResults->m_pL->m_oMatrix[iI1][iI3] = pResults->m_pU->m_oMatrix[iI1][iI3] / pResults->m_pU->m_oMatrix[iI3][iI3];
 				for (iI2 = iI3 + 1; iI2 < m_iNumRows; ++iI2) {
-					oResults.m_pU->m_oMatrix[iI1][iI2] -= oResults.m_pL->m_oMatrix[iI1][iI3] * oResults.m_pU->m_oMatrix[iI3][iI2];
+					pResults->m_pU->m_oMatrix[iI1][iI2] -= pResults->m_pL->m_oMatrix[iI1][iI3] * pResults->m_pU->m_oMatrix[iI3][iI2];
 				}
-				oResults.m_pU->m_oMatrix[iI1][iI3] = 0.0;
+				pResults->m_pU->m_oMatrix[iI1][iI3] = 0.0;
 			}
 		}
 
-		return oResults;
+		return pResults;
 	}
 
-	Matrix Matrix::linearSystemSolver(const Matrix& oB, const PLU_Factorization& oPLU) {
+	Matrix* Matrix::linearSystemSolver(const Matrix& oB, const PLU_Factorization& oPLU) {
 		int iI1;
 		int iI2;
 		int iIndex;
@@ -163,7 +163,7 @@ namespace SimulationEngine {
 		Matrix oX(iNumRows, 1); // UX = Y
 		Matrix oY(iNumRows, 1); // LY = B_Permuted
 		Matrix oB_Permuted(iNumRows, 1);
-		Matrix oX_Final(iNumRows, 1);
+		Matrix* pX_Final = new Matrix(iNumRows, 1);
 
 		// Apply row permutations to B to get B_Permuted
 		for (iI1 = 0; iI1 < iNumRows; ++iI1) {
@@ -191,10 +191,10 @@ namespace SimulationEngine {
 		// Apply column permutations to X using Q to get X_Final
 		for (iI1 = 0; iI1 < iNumRows; ++iI1) {
 			iIndex = (int)round(oPLU.m_pQ->m_oMatrix[iI1][0]);
-			oX_Final.m_oMatrix[iIndex][0] = oX.m_oMatrix[iI1][0];
+			pX_Final->m_oMatrix[iIndex][0] = oX.m_oMatrix[iI1][0];
 		}
 
-		return oX_Final;
+		return pX_Final;
 	}
 
 }

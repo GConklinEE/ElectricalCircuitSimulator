@@ -35,8 +35,8 @@ namespace SimulationEngine {
 			void clear();
 			Matrix* clone() const;
 			void printMatrix() const;
-			PLU_Factorization runPLU_Factorization() const;
-			static Matrix linearSystemSolver(const Matrix& oSourceVector, const PLU_Factorization& oPLU_Factorization);
+			PLU_Factorization* runPLU_Factorization() const;
+			static Matrix* linearSystemSolver(const Matrix& oSourceVector, const PLU_Factorization& oPLU_Factorization);
 
 		private:
 
@@ -58,10 +58,10 @@ namespace SimulationEngine {
 			};
 
 			~PLU_Factorization() {
-				delete(m_pL);
-				delete(m_pU);
-				delete(m_pP);
-				delete(m_pQ);
+				delete m_pL;
+				delete m_pU;
+				delete m_pP;
+				delete m_pQ;
 			};
 
 			Matrix* m_pL; // Lower triangular matrix
