@@ -185,7 +185,11 @@ namespace SimulationEngine {
 			for (iI2 = iI1 + 1; iI2 < iNumRows; ++iI2) {
 				oX.m_oMatrix[iI1][0] -= oPLU.m_pU->m_oMatrix[iI1][iI2] * oX.m_oMatrix[iI2][0];
 			}
-			oX.m_oMatrix[iI1][0] /= oPLU.m_pU->m_oMatrix[iI1][iI1];
+			if (fabs(oPLU.m_pU->m_oMatrix[iI1][iI1]) > 1e-9) {
+				oX.m_oMatrix[iI1][0] /= oPLU.m_pU->m_oMatrix[iI1][iI1];
+			} else {
+				oX.m_oMatrix[iI1][0] = 0; // If a diagonal on the U matrix is 0, it's due to the ground node being included in the matrix, and is effectively infinity, resulting in oX = 0 for this row.
+			}
 		}
 
 		// Apply column permutations to X using Q to get X_Final
@@ -193,6 +197,15 @@ namespace SimulationEngine {
 			iIndex = (int)round(oPLU.m_pQ->m_oMatrix[iI1][0]);
 			pX_Final->m_oMatrix[iIndex][0] = oX.m_oMatrix[iI1][0];
 		}
+
+#ifdef MATRIX_PRINT
+		cout << "X Vector:" << endl;
+		oX.printMatrix();
+		cout << "Y Vector:" << endl;
+		oY.printMatrix();
+		cout << "B Permuted Vector:" << endl;
+		oB_Permuted.printMatrix();
+#endif
 
 		return pX_Final;
 	}

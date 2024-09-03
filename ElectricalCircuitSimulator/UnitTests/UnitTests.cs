@@ -251,6 +251,7 @@ namespace UnitTests
         public void TestLinearCircuit()
         {
             bool bDone = false;
+            int iSteps = 0;
             LinearCircuit oLinearCircuit = new LinearCircuit(4);
             oLinearCircuit.addGroundedVoltageSource(1, 2, 30, 10);
             oLinearCircuit.addCapacitor(1, 0, 10);
@@ -263,15 +264,23 @@ namespace UnitTests
             oLinearCircuit.setTimeStep(1);
             AssertAction.VerifyAssert(() => oLinearCircuit.setTimeStep(0), "Expected 'Time step must be greater than 0!' error, did not get it!");
             Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 0, "Incorrect time! Expected 0");
-            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(0), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(7), "Expected 'Requested node does not exist!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(2), "Expected 'Cannot read voltages from a circuit that has not been simulated!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oLinearCircuit.getCurrent(8), "Expected 'Requested component does not exist!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oLinearCircuit.getCurrent(0), "Expected 'Cannot read currents from a circuit that has not been simulated!' error, did not get it!");
             AssertAction.VerifyAssert(() => oLinearCircuit.step(), "Expected 'Circuit has not been initalized!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.getCurrent(0), "Expected 'Cannot read currents from a circuit that has not been simulated!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(2), "Expected 'Cannot read voltages from a circuit that has not been simulated!' error, did not get it!");
             oLinearCircuit.initalize();
             bDone = oLinearCircuit.step();
+            iSteps++;
+            AssertAction.VerifyAssert(() => oLinearCircuit.getCurrent(8), "Expected 'Requested component does not exist!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(-6), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(7), "Expected 'Requested node does not exist!' error, did not get it!");
             Assert.IsTrue(bDone == false, "Simulation is not supposed to be done on the first step!");
+            do
+            {
+                bDone = oLinearCircuit.step();
+                iSteps++;
+            }
+            while (bDone == false && iSteps < 20);
+            Assert.IsTrue(iSteps == 10, "Simulation did not finish in the correct number of time steps!");
 
             AssertAction.VerifyAssert(() => new LinearCircuit(-5), "Expected 'Circuit must have a positive and non-zero number of components!' error, did not get it!");
             AssertAction.VerifyAssert(() => new LinearCircuit(0), "Expected 'Circuit must have a positive and non-zero number of components!' error, did not get it!");
@@ -302,23 +311,59 @@ namespace UnitTests
         [TestMethod]
         public void SimulationIntegrationTestR()
         {
+            bool bDone;
+            int iSteps = 0;
             LinearCircuit oLinearCircuit = new LinearCircuit(3);
 
-            oLinearCircuit.addGroundedVoltageSource(1, 2, 30, 10);
+            oLinearCircuit.addGroundedVoltageSource(2, 1, 30, 10); // Node 2 is ground
             oLinearCircuit.addResistor(1, 0, 10);
             oLinearCircuit.addResistor(0, 2, 10);
-
             oLinearCircuit.setStopTime(10);
             oLinearCircuit.setTimeStep(1);
+            oLinearCircuit.initalize();
 
-            //oLinearCircuit.initalize();
-            //do
-            //{
-            //    bDone = oLinearCircuit.step();
-            //}
-            //while (bDone == false);
+            do
+            {
+                bDone = oLinearCircuit.step();
+                iSteps++;
+            }
+            while (bDone == false && iSteps < 20);
 
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 10, "Incorrect time! Expected 10");
+            Assert.IsTrue(iSteps == 10, "Simulation did not finish in the correct number of time steps!");
+            Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 10, "Incorrect time! Expected 10");
+            Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(0)) == 10, "Incorrect voltage at node 0! Expected 10");
+            Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(1)) == 20, "Incorrect voltage at node 1! Expected 20");
+            Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(2)) == 0, "Incorrect voltage at node 2! Expected 0");
+            Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(0)) == 1, "Incorrect current at component 0! Expected 1");
+            Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(1)) == 1, "Incorrect current at component 1! Expected 1");
+            Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(2)) == 1, "Incorrect current at component 2! Expected 1");
+
+            oLinearCircuit.Dispose();
+        }
+
+        [TestMethod]
+        public void SimulationIntegrationTestRC()
+        {
+            bool bDone;
+            int iSteps = 0;
+            LinearCircuit oLinearCircuit = new LinearCircuit(3);
+
+            oLinearCircuit.addGroundedVoltageSource(2, 1, 30, 10); // Node 2 is ground
+            oLinearCircuit.addResistor(1, 0, 10);
+            oLinearCircuit.addCapacitor(0, 2, 0.2);
+            oLinearCircuit.setStopTime(10);
+            oLinearCircuit.setTimeStep(1);
+            oLinearCircuit.initalize();
+
+            do
+            {
+                bDone = oLinearCircuit.step();
+                iSteps++;
+            }
+            while (bDone == false);
+
+            Assert.IsTrue(iSteps == 10, "Simulation did not finish in the correct number of time steps!");
+            Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 10, "Incorrect time! Expected 10");
             //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(0)) == 10, "Incorrect voltage at node 0! Expected 10");
             //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(1)) == 20, "Incorrect voltage at node 1! Expected 20");
             //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(2)) == 0, "Incorrect voltage at node 2! Expected 0");
@@ -326,55 +371,40 @@ namespace UnitTests
             //Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(1)) == 1, "Incorrect current at component 1! Expected 1");
             //Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(2)) == 1, "Incorrect current at component 2! Expected 1");
 
-            //oLinearCircuit.Dispose();
-        }
-
-        [TestMethod]
-        public void SimulationIntegrationTestRC()
-        {
-            LinearCircuit oLinearCircuit = new LinearCircuit(3);
-
-            oLinearCircuit.addGroundedVoltageSource(1, 2, 30, 10);
-            oLinearCircuit.addResistor(1, 0, 10);
-            oLinearCircuit.addCapacitor(0, 2, 0.0001);
-
-            oLinearCircuit.setStopTime(10);
-            oLinearCircuit.setTimeStep(1);
-
-            //oLinearCircuit.initalize();
-            //do
-            //{
-            //    bDone = oLinearCircuit.step();
-            //}
-            //while (bDone == false);
-
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 10, "Incorrect time! Expected 10");
-
-            //oLinearCircuit.Dispose();
+            oLinearCircuit.Dispose();
         }
 
         [TestMethod]
         public void SimulationIntegrationTestRL()
         {
+            bool bDone;
+            int iSteps = 0;
             LinearCircuit oLinearCircuit = new LinearCircuit(3);
 
-            oLinearCircuit.addGroundedVoltageSource(1, 2, 30, 10);
+            oLinearCircuit.addGroundedVoltageSource(2, 1, 30, 10); // Node 2 is ground
             oLinearCircuit.addResistor(1, 0, 10);
-            oLinearCircuit.addInductor(0, 2, 0.0001);
-
+            oLinearCircuit.addInductor(0, 2, 0.2);
             oLinearCircuit.setStopTime(10);
             oLinearCircuit.setTimeStep(1);
+            oLinearCircuit.initalize();
 
-            //oLinearCircuit.initalize();
-            //do
-            //{
-            //    bDone = oLinearCircuit.step();
-            //}
-            //while (bDone == false);
+            do
+            {
+                bDone = oLinearCircuit.step();
+                iSteps++;
+            }
+            while (bDone == false);
 
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 10, "Incorrect time! Expected 10");
+            Assert.IsTrue(iSteps == 10, "Simulation did not finish in the correct number of time steps!");
+            Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 10, "Incorrect time! Expected 10");
+            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(0)) == 10, "Incorrect voltage at node 0! Expected 10");
+            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(1)) == 20, "Incorrect voltage at node 1! Expected 20");
+            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(2)) == 0, "Incorrect voltage at node 2! Expected 0");
+            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(0)) == 1, "Incorrect current at component 0! Expected 1");
+            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(1)) == 1, "Incorrect current at component 1! Expected 1");
+            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(2)) == 1, "Incorrect current at component 2! Expected 1");
 
-            //oLinearCircuit.Dispose();
+            oLinearCircuit.Dispose();
         }
     }
 

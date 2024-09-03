@@ -30,8 +30,6 @@ namespace SimulationEngine {
 	}
 
 	LinearCircuit::~LinearCircuit() {
-		int iComponentIterator;
-
 		delete[] m_pCircuitComponents;
 		delete m_pConductanceMatrix;
 		delete m_pSourceVector;
@@ -127,7 +125,7 @@ namespace SimulationEngine {
 	}
 
 	double LinearCircuit::getCurrent(const int iComponentIndex) const {
-		if (iComponentIndex < m_iComponentCount) {
+		if (iComponentIndex >= m_iComponentCount) {
 			cout << "Requested component does not exist!" << endl;
 			throw invalid_argument("Requested component does not exist!");
 		}
@@ -182,16 +180,25 @@ namespace SimulationEngine {
 			m_pCircuitComponents[iIterator]->initalize(*m_pConductanceMatrix, m_dTimeStep);
 		}
 
+		// Factor the conductance matrix
+		m_pPLU_Factorization = m_pConductanceMatrix->runPLU_Factorization();
+
 #ifdef MATRIX_PRINT
 		// Print out the matrices
 		cout << "Conductance Matrix:" << endl;
 		m_pConductanceMatrix->printMatrix();
 		cout << "Source Vector:" << endl;
 		m_pSourceVector->printMatrix();
+		cout << "PLU Factorization Matrixes:" << endl;
+		cout << "L:" << endl;
+		m_pPLU_Factorization->m_pL->printMatrix();
+		cout << "P:" << endl;
+		m_pPLU_Factorization->m_pP->printMatrix();
+		cout << "Q:" << endl;
+		m_pPLU_Factorization->m_pQ->printMatrix();
+		cout << "U:" << endl;
+		m_pPLU_Factorization->m_pU->printMatrix();
 #endif
-
-		// Factor the conductance matrix
-		m_pPLU_Factorization = m_pConductanceMatrix->runPLU_Factorization();
 
 		// Set simulation time to zero
 		m_dTime = 0;
@@ -206,6 +213,10 @@ namespace SimulationEngine {
 			cout << "Circuit has not been initalized!" << endl;
 			throw exception("Circuit has not been initalized!");
 		}
+
+#ifdef MATRIX_PRINT
+		cout << "**** Time: " << m_dTime << " s ****\n" << endl;
+#endif
 
 		m_pSourceVector->clear(); // Is rebuilt every step
 
@@ -226,7 +237,8 @@ namespace SimulationEngine {
 		m_bRunSim = true;
 
 #ifdef MATRIX_PRINT
-		cout << "Time: " << m_dTime << " s" << endl;
+		cout << "Source Vector:" << endl;
+		m_pSourceVector->printMatrix();
 		cout << "Voltage Matrix:" << endl;
 		m_pVoltageMatrix->printMatrix();
 #endif
