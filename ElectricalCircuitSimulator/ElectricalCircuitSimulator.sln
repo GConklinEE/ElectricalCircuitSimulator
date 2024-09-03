@@ -10,6 +10,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimulationEngine", "Simulat
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimulationEngineWrapper", "SimulationEngineWrapper\SimulationEngineWrapper.vcxproj", "{91B47255-3A6A-40BD-A73B-7406C393BB09}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimulationEngineDebugger", "SimulationEngineDebugger\SimulationEngineDebugger.vcxproj", "{56FA7BE9-4CD3-4371-8A73-CC55AC36AF54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -32,6 +34,9 @@ Global
 		{91B47255-3A6A-40BD-A73B-7406C393BB09}.Debug|x64.Build.0 = Debug|x64
 		{91B47255-3A6A-40BD-A73B-7406C393BB09}.Release|x64.ActiveCfg = Release|x64
 		{91B47255-3A6A-40BD-A73B-7406C393BB09}.Release|x64.Build.0 = Release|x64
+		{56FA7BE9-4CD3-4371-8A73-CC55AC36AF54}.Debug|x64.ActiveCfg = Debug|x64
+		{56FA7BE9-4CD3-4371-8A73-CC55AC36AF54}.Debug|x64.Build.0 = Debug|x64
+		{56FA7BE9-4CD3-4371-8A73-CC55AC36AF54}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

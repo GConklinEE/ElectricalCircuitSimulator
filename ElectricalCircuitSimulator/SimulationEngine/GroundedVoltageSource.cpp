@@ -7,7 +7,7 @@ using std::invalid_argument;
 namespace SimulationEngine {
 
 	GroundedVoltageSource::GroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance)
-	: CircuitComponent(iNodeS, iNodeD, true) { // iNodeD is assumed to be ground
+	: CircuitComponent(iNodeS, iNodeD, true) { // iNodeS is assumed to be ground
 		if (dResistance <= 0) {
 			cout << "Resistance value must be greater than 0!" << endl;
 			throw invalid_argument("Resistance value must be greater than 0!");
@@ -53,7 +53,7 @@ namespace SimulationEngine {
 	}
 
 	void GroundedVoltageSource::postStep(Matrix& oVoltageMatrix, const double dTimeStep) {
-		m_dCurrent = (oVoltageMatrix.getValue(m_iNodeS, 0) - oVoltageMatrix.getValue(m_iNodeD, 0)) / m_dResistance;
+		m_dCurrent = (m_dVoltage - (oVoltageMatrix.getValue(m_iNodeD, 0) - oVoltageMatrix.getValue(m_iNodeS, 0))) / m_dResistance;
 	}
 
 }
