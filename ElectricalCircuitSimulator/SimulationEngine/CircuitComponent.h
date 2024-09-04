@@ -24,16 +24,17 @@ namespace SimulationEngine {
 				return m_dCurrent;
 			}
 			virtual void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
-			virtual void step(Matrix& oSourceVector, const double dTimeStep);
-			virtual void postStep(Matrix& oVoltageMatrix, const double dTimeStep);
+			virtual void step(Matrix& oSourceVector);
+			virtual void postStep(Matrix& oVoltageMatrix);
 
 		protected:
 
-			virtual void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep) const;
+			virtual void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
 
 			bool m_bIsGround;
 			int m_iNodeS; // Source
 			int m_iNodeD; // Destination
+			double m_dComponentResistanceStamp;
 			double m_dCurrent; // Current is positive if flowing from source to destination, negative if the opposite direction
 	};
 

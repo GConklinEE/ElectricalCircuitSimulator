@@ -309,7 +309,7 @@ namespace UnitTests
     public class SimulationIntegrationTests
     {
         [TestMethod]
-        public void SimulationIntegrationTestR()
+        public void SimulationIntegrationTestRR()
         {
             bool bDone;
             int iSteps = 0;
@@ -331,12 +331,12 @@ namespace UnitTests
 
             Assert.IsTrue(iSteps == 10, "Simulation did not finish in the correct number of time steps!");
             Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 10, "Incorrect time! Expected 10");
-            Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(0)) == 10, "Incorrect voltage at node 0! Expected 10");
-            Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(1)) == 20, "Incorrect voltage at node 1! Expected 20");
-            Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(2)) == 0, "Incorrect voltage at node 2! Expected 0");
-            Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(0)) == 1, "Incorrect current at component 0! Expected 1");
-            Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(1)) == 1, "Incorrect current at component 1! Expected 1");
-            Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(2)) == 1, "Incorrect current at component 2! Expected 1");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getVoltage(0))) / 10000 == 10, "Incorrect voltage at node 0! Expected 10");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getVoltage(1))) / 10000 == 20, "Incorrect voltage at node 1! Expected 20");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getVoltage(2))) / 10000 == 0, "Incorrect voltage at node 2! Expected 0");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getCurrent(0))) / 10000 == 1, "Incorrect current at component 0! Expected 1");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getCurrent(1))) / 10000 == 1, "Incorrect current at component 1! Expected 1");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getCurrent(2))) / 10000 == 1, "Incorrect current at component 2! Expected 1");
 
             oLinearCircuit.Dispose();
         }
@@ -364,12 +364,12 @@ namespace UnitTests
 
             Assert.IsTrue(iSteps == 10, "Simulation did not finish in the correct number of time steps!");
             Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 10, "Incorrect time! Expected 10");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(0)) == 10, "Incorrect voltage at node 0! Expected 10");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(1)) == 20, "Incorrect voltage at node 1! Expected 20");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(2)) == 0, "Incorrect voltage at node 2! Expected 0");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(0)) == 1, "Incorrect current at component 0! Expected 1");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(1)) == 1, "Incorrect current at component 1! Expected 1");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(2)) == 1, "Incorrect current at component 2! Expected 1");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getVoltage(0))) / 10000 == 27.2224, "Incorrect voltage at node 0! Expected 27.2224");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getVoltage(1))) / 10000 == 28.6112, "Incorrect voltage at node 1! Expected 28.6112");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getVoltage(2))) / 10000 == 0, "Incorrect voltage at node 2! Expected 0");
+            Assert.IsTrue(Math.Truncate(Math.Round(100000 * oLinearCircuit.getCurrent(0))) / 100000 == 0.13888, "Incorrect current at component 0! Expected 0.13888");
+            Assert.IsTrue(Math.Truncate(Math.Round(100000 * oLinearCircuit.getCurrent(1))) / 100000 == 0.13888, "Incorrect current at component 1! Expected 0.13888");
+            Assert.IsTrue(Math.Truncate(Math.Round(100000 * oLinearCircuit.getCurrent(2))) / 100000 == 0.13888, "Incorrect current at component 2! Expected 0.13888");
 
             oLinearCircuit.Dispose();
         }
@@ -383,7 +383,7 @@ namespace UnitTests
 
             oLinearCircuit.addGroundedVoltageSource(2, 1, 30, 10); // Node 2 is ground
             oLinearCircuit.addResistor(1, 0, 10);
-            oLinearCircuit.addInductor(0, 2, 0.2);
+            oLinearCircuit.addInductor(0, 2, 50);
             oLinearCircuit.setStopTime(10);
             oLinearCircuit.setTimeStep(1);
             oLinearCircuit.initalize();
@@ -397,12 +397,12 @@ namespace UnitTests
 
             Assert.IsTrue(iSteps == 10, "Simulation did not finish in the correct number of time steps!");
             Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 10, "Incorrect time! Expected 10");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(0)) == 10, "Incorrect voltage at node 0! Expected 10");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(1)) == 20, "Incorrect voltage at node 1! Expected 20");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getVoltage(2)) == 0, "Incorrect voltage at node 2! Expected 0");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(0)) == 1, "Incorrect current at component 0! Expected 1");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(1)) == 1, "Incorrect current at component 1! Expected 1");
-            //Assert.IsTrue((int)Math.Round(oLinearCircuit.getCurrent(2)) == 1, "Incorrect current at component 2! Expected 1");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getVoltage(0))) / 10000 == 0.6503, "Incorrect voltage at node 0! Expected 0.6503");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getVoltage(1))) / 10000 == 15.3252, "Incorrect voltage at node 1! Expected 15.3252");
+            Assert.IsTrue(Math.Truncate(Math.Round(10000 * oLinearCircuit.getVoltage(2))) / 10000 == 0, "Incorrect voltage at node 2! Expected 0");
+            Assert.IsTrue(Math.Truncate(Math.Round(100000 * oLinearCircuit.getCurrent(0))) / 100000 == 1.46748, "Incorrect current at component 0! Expected 1.46748");
+            Assert.IsTrue(Math.Truncate(Math.Round(100000 * oLinearCircuit.getCurrent(1))) / 100000 == 1.46748, "Incorrect current at component 1! Expected 1.46748");
+            Assert.IsTrue(Math.Truncate(Math.Round(100000 * oLinearCircuit.getCurrent(2))) / 100000 == 1.46748, "Incorrect current at component 2! Expected 1.46748");
 
             oLinearCircuit.Dispose();
         }

@@ -36,6 +36,7 @@ namespace SimulationEngine {
 			int m_iMaxComponentCount;
 			int m_iComponentCount;
 			int m_iMaxNode;
+			int m_iGroundNode;
 			double m_dStopTime;
 			double m_dTimeStep;
 			double m_dTime;
