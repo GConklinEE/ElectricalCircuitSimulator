@@ -1,3 +1,15 @@
+// This component is based on the equation: i(t) = dt/2L*v(t) - (-dt/2L*v(t-1) - i(t-1))
+//     i(t-x) is the component current going from + to - at t-x time steps.
+//     v(t-x) is the voltage potential from - to + at t-x time steps.
+//     L is the inductance.
+//     dt is the simulation time step.
+// Matrix stamp is based on the i(t) equation for the current time step.
+// The source vector does NOT show the currents in the system after the time step.
+// Conductance matrix stamp uses the dt/2L term (internal resistance).
+// Source vector stamp uses the dt/2L*v(t-1) + i(t-1) term (internal current source).
+// Post step calculates i(t) for the current step.
+// iNodeS is assumed to be (+), iNodeD is assumed to be (-).
+
 #include "Inductor.h"
 
 using std::cout;
@@ -21,36 +33,39 @@ namespace SimulationEngine {
 		applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
 	}
 
-	void Inductor::applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep) const {
+	void Inductor::applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep) {
 		double dResistance;
-		double dComponentResistance = dTimeStep / (2.0 * m_dInductance);
+
+		m_dComponentResistanceStamp = dTimeStep / (2.0 * m_dInductance);
 
 		dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeS);
-		oConductanceMatrix.setValue(m_iNodeS, m_iNodeS, dResistance + dComponentResistance);
+		oConductanceMatrix.setValue(m_iNodeS, m_iNodeS, dResistance + m_dComponentResistanceStamp);
 
 		dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeD);
-		oConductanceMatrix.setValue(m_iNodeS, m_iNodeD, dResistance - dComponentResistance);
+		oConductanceMatrix.setValue(m_iNodeS, m_iNodeD, dResistance - m_dComponentResistanceStamp);
 
 		dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeS);
-		oConductanceMatrix.setValue(m_iNodeD, m_iNodeS, dResistance - dComponentResistance);
+		oConductanceMatrix.setValue(m_iNodeD, m_iNodeS, dResistance - m_dComponentResistanceStamp);
 
 		dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeD);
-		oConductanceMatrix.setValue(m_iNodeD, m_iNodeD, dResistance + dComponentResistance);
+		oConductanceMatrix.setValue(m_iNodeD, m_iNodeD, dResistance + m_dComponentResistanceStamp);
 	};
 
-	void Inductor::step(Matrix& oSourceVector, const double dTimeStep) { // Trapezoidal integration
+	void Inductor::step(Matrix& oSourceVector) { // Trapezoidal integration
 		double dCurrent;
 
-		m_dCurrent = dTimeStep / (2.0 * m_dInductance) * (m_dVoltageDeltaT + m_dVoltageDeltaTM1) + m_dCurrent;
-		dCurrent = oSourceVector.getValue(m_iNodeD, 0);
-		oSourceVector.setValue(m_iNodeD, 0, dCurrent + m_dCurrent);
+		m_dCurrent = m_dComponentResistanceStamp * m_dVoltageDeltaT + m_dCurrent; // dt/2L*v(t-1) + i(t-1)
+
 		dCurrent = oSourceVector.getValue(m_iNodeS, 0);
 		oSourceVector.setValue(m_iNodeS, 0, dCurrent - m_dCurrent);
+
+		dCurrent = oSourceVector.getValue(m_iNodeD, 0);
+		oSourceVector.setValue(m_iNodeD, 0, dCurrent + m_dCurrent);
 	}
 
-	void Inductor::postStep(Matrix& oVoltageMatrix, const double dTimeStep) {
-		m_dVoltageDeltaTM1 = m_dVoltageDeltaT;
+	void Inductor::postStep(Matrix& oVoltageMatrix) {
 		m_dVoltageDeltaT = (oVoltageMatrix.getValue(m_iNodeS, 0) - oVoltageMatrix.getValue(m_iNodeD, 0));
+		m_dCurrent = m_dComponentResistanceStamp * m_dVoltageDeltaT + m_dCurrent; // i(t) = dt/2L*v(t) + dt/2L*v(t-1) + i(t-1), m_dCurrent = dt/2L*v(t-1) + i(t-1)
 	}
 
 }

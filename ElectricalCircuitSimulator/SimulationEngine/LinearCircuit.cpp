@@ -22,6 +22,7 @@ namespace SimulationEngine {
 		m_bHasGround = false;
 		m_iComponentCount = 0;
 		m_iMaxNode = 0;
+		m_iGroundNode = 0;
 		m_dStopTime = 0;
 		m_dTimeStep = 0;
 		m_dTime = 0;
@@ -57,6 +58,7 @@ namespace SimulationEngine {
 			m_bRunSim = false;
 			if (pCircuitComponent->getIsGround() == true) {
 				m_bHasGround = true;
+				m_iGroundNode = pCircuitComponent->getNodeS();
 			}
 			m_pCircuitComponents[m_iComponentCount] = pCircuitComponent;
 			m_iComponentCount++;
@@ -207,7 +209,8 @@ namespace SimulationEngine {
 	}
 
 	bool LinearCircuit::step() {
-		int iComponentIterator;
+		int iIterator;
+		double dNormalizationFactor;
 
 		if (m_bInitSim == false) {
 			cout << "Circuit has not been initalized!" << endl;
@@ -215,22 +218,30 @@ namespace SimulationEngine {
 		}
 
 #ifdef MATRIX_PRINT
-		cout << "**** Time: " << m_dTime << " s ****\n" << endl;
+		cout << "**** Time: " << (m_dTime + m_dTimeStep) << " s ****\n" << endl;
 #endif
 
 		m_pSourceVector->clear(); // Is rebuilt every step
 
 		// Run all component step functions
-		for (iComponentIterator = 0; iComponentIterator < m_iComponentCount; iComponentIterator++) {
-			m_pCircuitComponents[iComponentIterator]->step(*m_pSourceVector, m_dTimeStep);
+		for (iIterator = 0; iIterator < m_iComponentCount; iIterator++) {
+			m_pCircuitComponents[iIterator]->step(*m_pSourceVector);
 		}
 	
 		// Find the new voltage matrix
 		m_pVoltageMatrix = Matrix::linearSystemSolver(*m_pSourceVector, *m_pPLU_Factorization);
 
+		// Check to see if the voltage matrix requires normalization
+		dNormalizationFactor = -m_pVoltageMatrix->getValue(m_iGroundNode, 0);
+		if (dNormalizationFactor != 0) {
+			for (iIterator = 0; iIterator <= m_iMaxNode; iIterator++) {
+				m_pVoltageMatrix->setValue(iIterator, 0, (m_pVoltageMatrix->getValue(iIterator, 0) + dNormalizationFactor));
+			}
+		}
+
 		// Run all component post-step functions 
-		for (iComponentIterator = 0; iComponentIterator < m_iComponentCount; iComponentIterator++) {
-			m_pCircuitComponents[iComponentIterator]->postStep(*m_pVoltageMatrix, m_dTimeStep);
+		for (iIterator = 0; iIterator < m_iComponentCount; iIterator++) {
+			m_pCircuitComponents[iIterator]->postStep(*m_pVoltageMatrix);
 		}
 
 		m_dTime += m_dTimeStep;

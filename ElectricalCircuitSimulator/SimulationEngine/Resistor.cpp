@@ -1,3 +1,11 @@
+// This component is based on the equation: i(t) = 1/R * v(t)
+//     i(t) is the component current going from + to -.
+//     v(t) is the voltage potential from - to +.
+//     R is the resistance.
+// Matrix stamp is based on the i(t) equation for the current time step.
+// Conductance matrix stamp uses the 1/R term.
+// Post step calculates i(t) for the current step.
+
 #include "Resistor.h"
 
 using std::cout;
@@ -19,23 +27,25 @@ namespace SimulationEngine {
 		applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
 	}
 
-	void Resistor::applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep) const {
+	void Resistor::applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep) {
 		double dResistance;
 
+		m_dComponentResistanceStamp = 1.0 / m_dResistance;
+
 		dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeS);
-		oConductanceMatrix.setValue(m_iNodeS, m_iNodeS, dResistance + (1.0 / m_dResistance));
+		oConductanceMatrix.setValue(m_iNodeS, m_iNodeS, dResistance + m_dComponentResistanceStamp);
 
 		dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeD);
-		oConductanceMatrix.setValue(m_iNodeS, m_iNodeD, dResistance - (1.0 / m_dResistance));
+		oConductanceMatrix.setValue(m_iNodeS, m_iNodeD, dResistance - m_dComponentResistanceStamp);
 
 		dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeS);
-		oConductanceMatrix.setValue(m_iNodeD, m_iNodeS, dResistance - (1.0 / m_dResistance));
+		oConductanceMatrix.setValue(m_iNodeD, m_iNodeS, dResistance - m_dComponentResistanceStamp);
 
 		dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeD);
-		oConductanceMatrix.setValue(m_iNodeD, m_iNodeD, dResistance + (1.0 / m_dResistance));
+		oConductanceMatrix.setValue(m_iNodeD, m_iNodeD, dResistance + m_dComponentResistanceStamp);
 	};
 
-	void Resistor::postStep(Matrix& oVoltageMatrix, const double dTimeStep) {
+	void Resistor::postStep(Matrix& oVoltageMatrix) {
 		m_dCurrent = (oVoltageMatrix.getValue(m_iNodeS, 0) - oVoltageMatrix.getValue(m_iNodeD, 0)) / m_dResistance;
 	}
 
