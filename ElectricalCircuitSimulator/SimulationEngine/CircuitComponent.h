@@ -30,6 +30,7 @@ namespace SimulationEngine {
 		protected:
 
 			virtual void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
+			virtual void applySourceVectorMatrixStamp(Matrix& oSourceVector);
 
 			bool m_bIsGround;
 			int m_iNodeS; // Source

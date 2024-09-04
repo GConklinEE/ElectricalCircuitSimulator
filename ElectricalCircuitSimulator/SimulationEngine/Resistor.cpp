@@ -2,7 +2,7 @@
 //     i(t) is the component current going from + to -.
 //     v(t) is the voltage potential from - to +.
 //     R is the resistance.
-// Matrix stamp is based on the i(t) equation for the current time step.
+// Matrix stamp is based on the i(t) equation for the current time step. i(t) = (Conductance Matrix Stamp) * v(t) - ((+)Node Source Vector Stamp)
 // Conductance matrix stamp uses the 1/R term.
 // Post step calculates i(t) for the current step.
 

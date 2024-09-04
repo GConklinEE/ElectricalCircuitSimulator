@@ -15,6 +15,7 @@ namespace SimulationEngine {
 			void step(Matrix& oSourceVector); // Trapezoidal integration
 			void postStep(Matrix& oVoltageMatrix);
 			void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
+			void applySourceVectorMatrixStamp(Matrix& oSourceVector);
 
 		private:
 
