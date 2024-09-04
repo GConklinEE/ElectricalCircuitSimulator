@@ -3,7 +3,7 @@
 //     v(t) is the voltage potential from - to +.
 //     I is the internal source current going from - to +.
 //     R is the internal source resistance.
-// Matrix stamp is based on the i(t) equation for the current time step.
+// Matrix stamp is based on the i(t) equation for the current time step. i(t) = (Conductance Matrix Stamp) * v(t) - ((+)Node Source Vector Stamp)
 // Conductance matrix stamp uses the 1/R term (internal resistance).
 // Source vector stamp uses the I term (internal current source).
 // Post step calculates i(t) for the current step.
@@ -53,7 +53,7 @@ namespace SimulationEngine {
 		oConductanceMatrix.setValue(m_iNodeD, m_iNodeD, dResistance + m_dComponentResistanceStamp);
 	};
 
-	void GroundedVoltageSource::step(Matrix& oSourceVector) {
+	void GroundedVoltageSource::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
 		double dCurrent;
 		double dComponentCurrentStamp;
 
@@ -64,6 +64,10 @@ namespace SimulationEngine {
 
 		dCurrent = oSourceVector.getValue(m_iNodeD, 0);
 		oSourceVector.setValue(m_iNodeD, 0, dCurrent + dComponentCurrentStamp);
+	};
+
+	void GroundedVoltageSource::step(Matrix& oSourceVector) {
+		applySourceVectorMatrixStamp(oSourceVector);
 	}
 
 	void GroundedVoltageSource::postStep(Matrix& oVoltageMatrix) {

@@ -3,7 +3,7 @@
 //     v(t-x) is the voltage potential from - to + at t-x time steps.
 //     C is the capacitance.
 //     dt is the simulation time step.
-// Matrix stamp is based on the i(t) equation for the current time step.
+// Matrix stamp is based on the i(t) equation for the current time step. i(t) = (Conductance Matrix Stamp) * v(t) - ((+)Node Source Vector Stamp)
 // The source vector does NOT show the currents in the system after the time step.
 // Conductance matrix stamp uses the 2C/dt term (internal resistance).
 // Source vector stamp uses the 2C/dt*v(t-1) + i(t-1) term (internal current source).
@@ -50,16 +50,20 @@ namespace SimulationEngine {
 		oConductanceMatrix.setValue(m_iNodeD, m_iNodeD, dResistance + m_dComponentResistanceStamp);
 	};
 
-	void Capacitor::step(Matrix& oSourceVector) { // Trapezoidal integration
+	void Capacitor::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
 		double dCurrent;
 
-		m_dCurrent = m_dComponentResistanceStamp * (m_dVoltageDelta) + m_dCurrent; // 2C/dt*v(t-1) + i(t-1)
+		m_dCurrent = m_dComponentResistanceStamp * (m_dVoltageDelta)+m_dCurrent; // 2C/dt*v(t-1) + i(t-1)
 
 		dCurrent = oSourceVector.getValue(m_iNodeS, 0);
 		oSourceVector.setValue(m_iNodeS, 0, dCurrent + m_dCurrent);
 
 		dCurrent = oSourceVector.getValue(m_iNodeD, 0);
 		oSourceVector.setValue(m_iNodeD, 0, dCurrent - m_dCurrent);
+	};
+
+	void Capacitor::step(Matrix& oSourceVector) { // Trapezoidal integration
+		applySourceVectorMatrixStamp(oSourceVector);
 	}
 
 	void Capacitor::postStep(Matrix& oVoltageMatrix) {

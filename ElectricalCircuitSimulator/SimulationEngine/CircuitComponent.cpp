@@ -39,4 +39,8 @@ namespace SimulationEngine {
 		;
 	}
 
+	void CircuitComponent::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
+		;
+	}
+
 }
