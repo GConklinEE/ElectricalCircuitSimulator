@@ -59,9 +59,9 @@
                                             <DockPanel Grid.Row="2" Margin="0, 18, 0, 10">
                                                 <Button Name="xSimulateButton" FontSize="15" HorizontalAlignment="Right" Background="#ff9525" FontWeight="Bold" Content="Simulate Circuit" Width="150" Height="50" Margin="10,0,0,0" VerticalAlignment="Center" DockPanel.Dock="Right" Click="SimulateButton_Click"/>
                                                 <TextBlock Width="87" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Step Size (s):" Margin="12,10,0,10"></TextBlock>
-                                                <TextBox Name="xStepSizeTextBox" Width="80" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Center" Text="0.001" Margin="0,10,0,10" TextChanged="StepSizeTextBox_TextChanged"></TextBox>
-                                                <TextBlock Width="57" HorizontalAlignment="Left" FontSize="15" VerticalAlignment="Center" Text="# Steps:" Margin="20,10,0,10"></TextBlock>
-                                                <TextBox Name ="xStepNumTextBox" Width="80" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Center" Text="10" Margin="0,10,0,10" TextChanged="StepNumTextBox_TextChanged"></TextBox>
+                                                <TextBox Name="xStepSizeTextBox" Width="80" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Center" Text="0.01" Margin="0,10,0,10" TextChanged="StepSizeTextBox_TextChanged"></TextBox>
+                                                <TextBlock Width="57" HorizontalAlignment="Left" FontSize="15" VerticalAlignment="Center" Text="Stop (s):" Margin="20,10,0,10"></TextBlock>
+                                                <TextBox Name ="xStopTimeTextBox" Width="80" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Center" Text="10" Margin="0,10,0,10" TextChanged="StopTimeTextBox_TextChanged"></TextBox>
                                             </DockPanel>
                                             <!-- Plot view control for OxyPlot -->
                                             <oxy:PlotView Grid.Column="1" Grid.Row="0" x:Name="xPlotView1" Height="320" Margin="10,10,10,0" HorizontalAlignment="Stretch" VerticalAlignment="Top" />

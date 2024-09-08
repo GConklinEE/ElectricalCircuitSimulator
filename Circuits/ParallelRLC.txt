@@ -1,0 +1,10 @@
+Parallel RLC Circuit
+GroundedVoltageSource(0, 1, 10, 1)
+Resistor(0, 1, 10)
+Inductor(1, 0, 0.001)
+Resistor(1, 2, 1)
+Capacitor(2, 0, 0.0001)
+ScopeV(2)
+ScopeI(2)
+TimeStep(0.00003)
+StopTime(0.01)

@@ -1,0 +1,9 @@
+Series RLC Circuit
+GroundedVoltageSource(0, 1, 100, 1)
+Resistor(1, 2, 10)
+Capacitor(2, 3, 0.000001)
+Inductor(3, 0, 0.001)
+ScopeV(2)
+ScopeI(3)
+TimeStep(0.000003)
+StopTime(0.001)
