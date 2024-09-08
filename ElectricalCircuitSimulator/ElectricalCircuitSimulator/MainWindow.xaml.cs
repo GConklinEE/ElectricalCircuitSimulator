@@ -11,6 +11,7 @@ using System.Windows.Threading;
 using System.IO;
 using System.Collections.ObjectModel;
 using SimulationEngineWrapper;
+using OxyPlot.Axes;
 
 namespace ElectricalCircuitSimulator
 {
@@ -46,9 +47,38 @@ namespace ElectricalCircuitSimulator
             m_oImages = new Collection<Image>();
             LoadCircuits();
 
+            LinearAxis xAxisV = new LinearAxis
+            {
+                Position = AxisPosition.Bottom,
+                Title = "Time (s)",
+                AxisTitleDistance = 10
+            };
+            LinearAxis yAxisV = new LinearAxis
+            {
+                Position = AxisPosition.Left,
+                Title = "Voltage (V)",
+                AxisTitleDistance = 10
+            };
+            LinearAxis xAxisI = new LinearAxis
+            {
+                Position = AxisPosition.Bottom,
+                Title = "Time (s)",
+                AxisTitleDistance = 10
+            };
+            LinearAxis yAxisI = new LinearAxis
+            {
+                Position = AxisPosition.Left,
+                Title = "Current (A)",
+                AxisTitleDistance = 10
+            };
+
             // Create and configure the PlotModel
             m_oPlotModel1 = new PlotModel { Title = "V(t) Scope" };
             m_oPlotModel2 = new PlotModel { Title = "I(t) Scope" };
+            m_oPlotModel1.Axes.Add(xAxisV);
+            m_oPlotModel1.Axes.Add(yAxisV);
+            m_oPlotModel2.Axes.Add(xAxisI);
+            m_oPlotModel2.Axes.Add(yAxisI);
             m_oLineSeriesV = new LineSeries { Title = "V(t) Scope" };
             m_oLineSeriesI = new LineSeries { Title = "I(t) Scope" };
             m_oPlotModel1.Series.Add(m_oLineSeriesV);
@@ -393,6 +423,12 @@ namespace ElectricalCircuitSimulator
 
                         m_oLineSeriesV.Points.Clear();
                         m_oLineSeriesI.Points.Clear();
+
+                        m_oPlotModel1.ResetAllAxes();
+                        m_oPlotModel2.ResetAllAxes();
+
+                        m_oPlotModel1.InvalidatePlot(true);
+                        m_oPlotModel2.InvalidatePlot(true);
 
                         // Set up a timer to update the graph dynamically
                         m_oTimer = new DispatcherTimer
