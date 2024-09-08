@@ -24,6 +24,7 @@ namespace SimulationEngine {
 	}
 
 	void Resistor::initalize(Matrix& oConductanceMatrix, const double dTimeStep) {
+		m_dCurrent = 0;
 		applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
 	}
 

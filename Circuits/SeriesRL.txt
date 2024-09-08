@@ -1,0 +1,8 @@
+Series RL Circuit
+GroundedVoltageSource(0, 1, 10, 10)
+Resistor(1, 2, 10)
+Inductor(2, 0, 1);
+ScopeV(2)
+ScopeI(2)
+TimeStep(0.005)
+StopTime(0.5)

@@ -1,0 +1,8 @@
+Series RC Circuit
+GroundedVoltageSource(0, 1, 30, 10)
+Resistor(1, 2, 10)
+Capacitor(2, 0, 0.2);
+ScopeV(2)
+ScopeI(2)
+TimeStep(0.1)
+StopTime(15)

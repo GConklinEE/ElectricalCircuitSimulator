@@ -108,25 +108,30 @@ namespace UnitTests
                 oIndexTextBlock.Index = iFilesLoaded - 1;
                 AssertAction.CheckAssert(() => oMainWindow.TextBox_MouseLeftButtonDown(oIndexTextBlock, oMouseButtonEventArgsTest), "Loaded less files than expected!");
 
-                oTextBox.Text = "5";
+                oTextBox.Text = "5.7";
                 AssertAction.CheckAssert(() => oMainWindow.StepSizeTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepSizeTextBox_TextChanged!");
                 oTextBox.Text = "-1";
                 AssertAction.CheckAssert(() => oMainWindow.StepSizeTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepSizeTextBox_TextChanged!");
                 oTextBox.Text = "A";
                 AssertAction.CheckAssert(() => oMainWindow.StepSizeTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepSizeTextBox_TextChanged!");
 
-                oTextBox.Text = "5";
-                AssertAction.CheckAssert(() => oMainWindow.StepNumTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepNumTextBox_TextChanged!");
+                oTextBox.Text = "5.7";
+                AssertAction.CheckAssert(() => oMainWindow.StopTimeTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StopTimeTextBox_TextChanged!");
                 oTextBox.Text = "-1";
-                AssertAction.CheckAssert(() => oMainWindow.StepNumTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepNumTextBox_TextChanged!");
+                AssertAction.CheckAssert(() => oMainWindow.StopTimeTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StopTimeTextBox_TextChanged!");
                 oTextBox.Text = "A";
-                AssertAction.CheckAssert(() => oMainWindow.StepNumTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StepNumTextBox_TextChanged!");
+                AssertAction.CheckAssert(() => oMainWindow.StopTimeTextBox_TextChanged(oTextBox, oTextChangedEventArgs), "Failed to run StopTimeTextBox_TextChanged!");
 
                 AssertAction.CheckAssert(() => oMainWindow.Screen_MouseDown(oIndexTextBlock, oMouseButtonEventArgsTest), "Failed to run Screen_MouseDown!");
                 AssertAction.VerifyAssert(() => oMainWindow.CloseButton_Click(oButton, oRoutedEventArgs), "Expected running CloseButton_Click to fail, it did not!");
                 AssertAction.CheckAssert(() => oMainWindow.MinimizeButton_Click(oButton, oRoutedEventArgs), "Failed to run MinimizeButton_Click!");
 
-                // Event toggles states, so call it twice
+                // SimulateButton_Click event toggles states, so call it twice each test
+                AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
+                AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
+
+                oTextBox.Text = "1";
+                oMainWindow.StepSizeTextBox_TextChanged(oTextBox, oTextChangedEventArgs);
                 AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
                 AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
             }

@@ -29,6 +29,8 @@ namespace SimulationEngine {
 	}
 
 	void Capacitor::initalize(Matrix& oConductanceMatrix, const double dTimeStep) {
+		m_dCurrent = 0;
+		m_dVoltageDelta = 0;
 		applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
 	}
 

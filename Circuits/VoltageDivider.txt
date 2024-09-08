@@ -1,0 +1,8 @@
+Voltage Divider
+GroundedVoltageSource(0, 1, 30, 10)
+Resistor(1, 2, 10)
+Resistor(2, 0, 10)
+ScopeV(2)
+ScopeI(2)
+TimeStep(1)
+StopTime(2)

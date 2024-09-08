@@ -32,6 +32,7 @@ namespace SimulationEngine {
 	}
 
 	void GroundedVoltageSource::initalize(Matrix& oConductanceMatrix, const double dTimeStep) {
+		m_dCurrent = 0;
 		applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
 	}
 

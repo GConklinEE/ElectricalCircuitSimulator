@@ -25,11 +25,12 @@ namespace SimulationEngine {
 			throw invalid_argument("Inductance value must be greater than 0!");
 		}
 		m_dInductance = dInductance;
-		m_dVoltageDeltaT = 0;
-		m_dVoltageDeltaTM1 = 0;
+		m_dVoltageDelta = 0;
 	}
 
 	void Inductor::initalize(Matrix& oConductanceMatrix, const double dTimeStep) {
+		m_dCurrent = 0;
+		m_dVoltageDelta = 0;
 		applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
 	}
 
@@ -54,7 +55,7 @@ namespace SimulationEngine {
 	void Inductor::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
 		double dCurrent;
 
-		m_dCurrent = m_dComponentResistanceStamp * m_dVoltageDeltaT + m_dCurrent; // dt/2L*v(t-1) + i(t-1)
+		m_dCurrent = m_dComponentResistanceStamp * m_dVoltageDelta + m_dCurrent; // dt/2L*v(t-1) + i(t-1)
 
 		dCurrent = oSourceVector.getValue(m_iNodeS, 0);
 		oSourceVector.setValue(m_iNodeS, 0, dCurrent - m_dCurrent);
@@ -68,8 +69,8 @@ namespace SimulationEngine {
 	}
 
 	void Inductor::postStep(Matrix& oVoltageMatrix) {
-		m_dVoltageDeltaT = (oVoltageMatrix.getValue(m_iNodeS, 0) - oVoltageMatrix.getValue(m_iNodeD, 0));
-		m_dCurrent = m_dComponentResistanceStamp * m_dVoltageDeltaT + m_dCurrent; // i(t) = dt/2L*v(t) + dt/2L*v(t-1) + i(t-1), m_dCurrent = dt/2L*v(t-1) + i(t-1)
+		m_dVoltageDelta = (oVoltageMatrix.getValue(m_iNodeS, 0) - oVoltageMatrix.getValue(m_iNodeD, 0));
+		m_dCurrent = m_dComponentResistanceStamp * m_dVoltageDelta + m_dCurrent; // i(t) = dt/2L*v(t) + dt/2L*v(t-1) + i(t-1), m_dCurrent = dt/2L*v(t-1) + i(t-1)
 	}
 
 }

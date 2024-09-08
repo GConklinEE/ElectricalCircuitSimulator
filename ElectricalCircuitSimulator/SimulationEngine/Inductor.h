@@ -20,8 +20,7 @@ namespace SimulationEngine {
 		private:
 
 			double m_dInductance;
-			double m_dVoltageDeltaT;
-			double m_dVoltageDeltaTM1;
+			double m_dVoltageDelta;
 	};
 
 }

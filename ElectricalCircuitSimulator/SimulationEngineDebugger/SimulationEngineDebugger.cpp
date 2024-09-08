@@ -14,7 +14,7 @@ using namespace SimulationEngine;
 using std::cout;
 using std::endl;
 
-void SimulationIntegrationTestRR()
+void SimulationIntegrationTestSeriesRR()
 {
     bool bDone;
     int iSteps = 0;
@@ -52,7 +52,7 @@ void SimulationIntegrationTestRR()
     delete pResistor2;
 }
 
-void SimulationIntegrationTestRC()
+void SimulationIntegrationTestSeriesRC()
 {
     bool bDone;
     int iSteps = 0;
@@ -90,7 +90,7 @@ void SimulationIntegrationTestRC()
     delete pCapacitor;
 }
 
-void SimulationIntegrationTestRL()
+void SimulationIntegrationTestSeriesRL()
 {
     bool bDone;
     int iSteps = 0;
@@ -132,7 +132,7 @@ int main()
 {
     cout << "********************* Simulation Engine Debugger *********************\n\n" << endl;
     // Enable whatever circuit system you want to debug
-    SimulationIntegrationTestRR();
-    //SimulationIntegrationTestRC();
-    //SimulationIntegrationTestRL();
+    SimulationIntegrationTestSeriesRR();
+    //SimulationIntegrationTestSeriesRC();
+    //SimulationIntegrationTestSeriesRL();
 }
