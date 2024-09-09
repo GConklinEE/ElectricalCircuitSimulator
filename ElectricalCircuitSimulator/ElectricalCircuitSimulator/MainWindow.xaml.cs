@@ -187,7 +187,7 @@ namespace ElectricalCircuitSimulator
                                 oLinearCircuit.addGroundedVoltageSource(int.Parse(sComponentParams[0]), int.Parse(sComponentParams[1]), double.Parse(sComponentParams[2]), double.Parse(sComponentParams[3]));
                                 break;
                             default:
-                                throw new Exception();
+                                throw new Exception("Unknown circuit component type!");
                         }
                     }
 
@@ -197,7 +197,7 @@ namespace ElectricalCircuitSimulator
                     iParamValue[0] = int.Parse(oTextLines[iLineIndex].Split("(")[1].Split(")")[0]);
                     if (sName != "ScopeV")
                     {
-                        throw new Exception();
+                        throw new Exception("Error with voltage scope formatting!");
                     }
 
                     iLineIndex += FileConstants.SCOPE_V_LINES;
@@ -205,7 +205,7 @@ namespace ElectricalCircuitSimulator
                     iParamValue[1] = int.Parse(oTextLines[iLineIndex].Split("(")[1].Split(")")[0]);
                     if (sName != "ScopeI")
                     {
-                        throw new Exception();
+                        throw new Exception("Error with current scope formatting!");
                     }
 
                     // Time params
@@ -214,7 +214,7 @@ namespace ElectricalCircuitSimulator
                     dParamValue[0] = double.Parse(oTextLines[iLineIndex].Split("(")[1].Split(")")[0]);
                     if (sName != "TimeStep")
                     {
-                        throw new Exception();
+                        throw new Exception("Error with time step formatting!");
                     }
 
                     iLineIndex += FileConstants.TIME_STEP_LINES;
@@ -222,7 +222,7 @@ namespace ElectricalCircuitSimulator
                     dParamValue[1] = double.Parse(oTextLines[iLineIndex].Split("(")[1].Split(")")[0]);
                     if (sName != "StopTime")
                     {
-                        throw new Exception();
+                        throw new Exception("Error with stop time formatting!");
                     }
 
                     // Add everything to collections at the end, so errors don't result in mismatching collection indexes
@@ -284,29 +284,45 @@ namespace ElectricalCircuitSimulator
             }
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        #endregion
+
+        #region Events
+
+        public void Timer_Tick(object sender, EventArgs e)
         {
             bool bDone;
 
-            bDone = m_oSimulations[m_oLastTextBlock.Index].step();
+            try
+            {
+                bDone = m_oSimulations[m_oLastTextBlock.Index].step();
+                if ((m_bTestMode == true) && (sender is IndexTextBlock)) // Unit test mode only
+                {
+                    bDone = true;
+                }
+
+                m_oLineSeriesV.Points.Add(new DataPoint(m_oSimulations[m_oLastTextBlock.Index].getTime(), m_oSimulations[m_oLastTextBlock.Index].getVoltage(m_oVoltageScopeNodes[m_oLastTextBlock.Index])));
+                m_oLineSeriesI.Points.Add(new DataPoint(m_oSimulations[m_oLastTextBlock.Index].getTime(), m_oSimulations[m_oLastTextBlock.Index].getCurrent(m_oCurrentScopeComponents[m_oLastTextBlock.Index])));
+
+                // Refresh the plot
+                m_oPlotModel1.InvalidatePlot(true);
+                m_oPlotModel2.InvalidatePlot(true);
+            }
+            catch
+            {
+                if (m_bTestMode == false)
+                {
+                    MessageBox.Show("Failed to run simulation!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                UI_Error = true;
+                bDone = true;
+            }
 
             if (bDone == true)
             {
                 xSimulateButton.Content = "Simulate Circuit";
                 m_oTimer.Stop();
             }
-
-            m_oLineSeriesV.Points.Add(new DataPoint(m_oSimulations[m_oLastTextBlock.Index].getTime(), m_oSimulations[m_oLastTextBlock.Index].getVoltage(m_oVoltageScopeNodes[m_oLastTextBlock.Index])));
-            m_oLineSeriesI.Points.Add(new DataPoint(m_oSimulations[m_oLastTextBlock.Index].getTime(), m_oSimulations[m_oLastTextBlock.Index].getCurrent(m_oCurrentScopeComponents[m_oLastTextBlock.Index])));
-
-            // Refresh the plot
-            m_oPlotModel1.InvalidatePlot(true);
-            m_oPlotModel2.InvalidatePlot(true);
         }
-
-        #endregion
-
-        #region Events
 
         public void TextBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -431,10 +447,10 @@ namespace ElectricalCircuitSimulator
                         m_oPlotModel1.InvalidatePlot(true);
                         m_oPlotModel2.InvalidatePlot(true);
 
-                        // Set up a timer to update the graph dynamically
+                        // Set up a timer to update the graph dynamically.
                         m_oTimer = new DispatcherTimer
                         {
-                            Interval = TimeSpan.FromSeconds(0.001)
+                            Interval = TimeSpan.FromSeconds(0.001) // Short delay to avoid locking up the UI during CPU intensive simulation.
                         };
                         m_oTimer.Tick += Timer_Tick;
                         m_oTimer.Start();
@@ -447,6 +463,7 @@ namespace ElectricalCircuitSimulator
                         {
                             MessageBox.Show("Failed to start simulation!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
+                        UI_Error = true;
                     }
                 }
             }
