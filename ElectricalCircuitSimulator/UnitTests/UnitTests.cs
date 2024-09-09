@@ -128,14 +128,26 @@ namespace UnitTests
                 AssertAction.VerifyAssert(() => oMainWindow.CloseButton_Click(oButton, oRoutedEventArgs), "Expected running CloseButton_Click to fail, it did not!");
                 AssertAction.CheckAssert(() => oMainWindow.MinimizeButton_Click(oButton, oRoutedEventArgs), "Failed to run MinimizeButton_Click!");
 
+                // The SimulateButton_Click and Timer_Tick events are also testing the simulation engine.
+                // It's a good idea to make sure the default circuit in the UI is one that has all components in it, so the unit tests hit everything.
                 // SimulateButton_Click event toggles states, so call it twice each test
                 AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
                 AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
-
                 oTextBox.Text = "1";
                 oMainWindow.StepSizeTextBox_TextChanged(oTextBox, oTextChangedEventArgs);
                 AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
                 AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
+                if (oMainWindow.UI_Error)
+                {
+                    Assert.Fail("UI error in SimulateButton_Click!");
+                }
+
+                AssertAction.CheckAssert(() => oMainWindow.Timer_Tick(oButton, oRoutedEventArgs), "Failed to run Timer_Tick!");
+                AssertAction.CheckAssert(() => oMainWindow.Timer_Tick(oIndexTextBlock, oRoutedEventArgs), "Failed to run Timer_Tick!");
+                if (oMainWindow.UI_Error)
+                {
+                    Assert.Fail("UI error in Timer_Tick!");
+                }
             }
         }
     }
