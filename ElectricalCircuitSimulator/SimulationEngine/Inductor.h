@@ -5,23 +5,23 @@
 
 namespace SimulationEngine {
 
-	class Inductor : public CircuitComponent {
+    class Inductor : public CircuitComponent {
 
-		public:
+        public:
 
-			Inductor(const int iNodeS, const int iNodeD, const double m_dInductance);
+            Inductor(const int iNodeS, const int iNodeD, const double m_dInductance);
 
-			void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
-			void step(Matrix& oSourceVector); // Trapezoidal integration
-			void postStep(Matrix& oVoltageMatrix);
-			void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
-			void applySourceVectorMatrixStamp(Matrix& oSourceVector);
+            void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
+            void step(Matrix& oSourceVector); // Trapezoidal integration
+            void postStep(Matrix& oVoltageMatrix);
+            void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
+            void applySourceVectorMatrixStamp(Matrix& oSourceVector);
 
-		private:
+        private:
 
-			double m_dInductance;
-			double m_dVoltageDelta;
-	};
+            double m_dInductance;
+            double m_dVoltageDelta;
+    };
 
 }
 

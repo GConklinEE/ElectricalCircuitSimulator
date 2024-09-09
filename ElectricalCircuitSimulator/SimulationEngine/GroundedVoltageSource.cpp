@@ -17,63 +17,63 @@ using std::invalid_argument;
 
 namespace SimulationEngine {
 
-	GroundedVoltageSource::GroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance)
-	: CircuitComponent(iNodeS, iNodeD, true) {
-		if (dResistance <= 0) {
-			cout << "Resistance value must be greater than 0!" << endl;
-			throw invalid_argument("Resistance value must be greater than 0!");
-		}
-		if (dVoltage <= 0) {
-			cout << "Voltage value must be greater than 0!" << endl;
-			throw invalid_argument("Voltage value must be greater than 0!");
-		}
-		m_dVoltage = dVoltage;
-		m_dResistance = dResistance;
-	}
+    GroundedVoltageSource::GroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance)
+    : CircuitComponent(iNodeS, iNodeD, true) {
+        if (dResistance <= 0) {
+            cout << "Resistance value must be greater than 0!" << endl;
+            throw invalid_argument("Resistance value must be greater than 0!");
+        }
+        if (dVoltage <= 0) {
+            cout << "Voltage value must be greater than 0!" << endl;
+            throw invalid_argument("Voltage value must be greater than 0!");
+        }
+        m_dVoltage = dVoltage;
+        m_dResistance = dResistance;
+    }
 
-	void GroundedVoltageSource::initalize(Matrix& oConductanceMatrix, const double dTimeStep) {
-		m_dCurrent = 0;
-		applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
-	}
+    void GroundedVoltageSource::initalize(Matrix& oConductanceMatrix, const double dTimeStep) {
+        m_dCurrent = 0;
+        applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
+    }
 
-	void GroundedVoltageSource::applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep) {
-		double dResistance;
+    void GroundedVoltageSource::applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep) {
+        double dResistance;
 
-		m_dComponentResistanceStamp = 1.0 / m_dResistance;
+        m_dComponentResistanceStamp = 1.0 / m_dResistance;
 
-		dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeS);
-		oConductanceMatrix.setValue(m_iNodeS, m_iNodeS, dResistance + m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeS);
+        oConductanceMatrix.setValue(m_iNodeS, m_iNodeS, dResistance + m_dComponentResistanceStamp);
 
-		dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeD);
-		oConductanceMatrix.setValue(m_iNodeS, m_iNodeD, dResistance - m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeD);
+        oConductanceMatrix.setValue(m_iNodeS, m_iNodeD, dResistance - m_dComponentResistanceStamp);
 
-		dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeS);
-		oConductanceMatrix.setValue(m_iNodeD, m_iNodeS, dResistance - m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeS);
+        oConductanceMatrix.setValue(m_iNodeD, m_iNodeS, dResistance - m_dComponentResistanceStamp);
 
-		dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeD);
-		oConductanceMatrix.setValue(m_iNodeD, m_iNodeD, dResistance + m_dComponentResistanceStamp);
-	};
+        dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeD);
+        oConductanceMatrix.setValue(m_iNodeD, m_iNodeD, dResistance + m_dComponentResistanceStamp);
+    };
 
-	void GroundedVoltageSource::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
-		double dCurrent;
-		double dComponentCurrentStamp;
+    void GroundedVoltageSource::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
+        double dCurrent;
+        double dComponentCurrentStamp;
 
-		dComponentCurrentStamp = m_dVoltage / m_dResistance;
+        dComponentCurrentStamp = m_dVoltage / m_dResistance;
 
-		dCurrent = oSourceVector.getValue(m_iNodeS, 0);
-		oSourceVector.setValue(m_iNodeS, 0, dCurrent - dComponentCurrentStamp);
+        dCurrent = oSourceVector.getValue(m_iNodeS, 0);
+        oSourceVector.setValue(m_iNodeS, 0, dCurrent - dComponentCurrentStamp);
 
-		dCurrent = oSourceVector.getValue(m_iNodeD, 0);
-		oSourceVector.setValue(m_iNodeD, 0, dCurrent + dComponentCurrentStamp);
-	};
+        dCurrent = oSourceVector.getValue(m_iNodeD, 0);
+        oSourceVector.setValue(m_iNodeD, 0, dCurrent + dComponentCurrentStamp);
+    };
 
-	void GroundedVoltageSource::step(Matrix& oSourceVector) {
-		applySourceVectorMatrixStamp(oSourceVector);
-	}
+    void GroundedVoltageSource::step(Matrix& oSourceVector) {
+        applySourceVectorMatrixStamp(oSourceVector);
+    }
 
-	void GroundedVoltageSource::postStep(Matrix& oVoltageMatrix) {
-		m_dCurrent = (m_dVoltage - (oVoltageMatrix.getValue(m_iNodeD, 0) - oVoltageMatrix.getValue(m_iNodeS, 0))) / m_dResistance;
-	}
+    void GroundedVoltageSource::postStep(Matrix& oVoltageMatrix) {
+        m_dCurrent = (m_dVoltage - (oVoltageMatrix.getValue(m_iNodeD, 0) - oVoltageMatrix.getValue(m_iNodeS, 0))) / m_dResistance;
+    }
 
 }
 

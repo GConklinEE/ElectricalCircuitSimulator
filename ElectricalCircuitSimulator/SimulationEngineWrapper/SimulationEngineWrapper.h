@@ -45,27 +45,27 @@ namespace SimulationEngineWrapper {
         
     public ref class PLU_Factorization : public ManagedObject<SimulationEngine::PLU_Factorization> {
 
-		public:
+        public:
 
-			PLU_Factorization() 
+            PLU_Factorization() 
             : ManagedObject(new SimulationEngine::PLU_Factorization()) { ; }
-	};
+    };
 
     public ref class Matrix : public ManagedObject<SimulationEngine::Matrix> {
 
-		public:
+        public:
 
-			Matrix()
+            Matrix()
             : ManagedObject(new SimulationEngine::Matrix()) { ; }
-			Matrix(const int iRows, const int iColumns)
+            Matrix(const int iRows, const int iColumns)
             : ManagedObject(new SimulationEngine::Matrix(iRows, iColumns)) { ; }
 
-			int getNumRows() { 
+            int getNumRows() { 
                 return m_pInstance->getNumRows();
-			}
-			int getNumColumns() {
+            }
+            int getNumColumns() {
                 return m_pInstance->getNumRows();
-			}
+            }
             double getValue(const int iRow, const int iColumn) {
                 return m_pInstance->getValue(iRow, iColumn);
             }
@@ -83,7 +83,7 @@ namespace SimulationEngineWrapper {
             void printMatrix() {
                 m_pInstance->printMatrix();
             }
-	};
+    };
 
     public ref class Capacitor : public ManagedObject<SimulationEngine::Capacitor> {
 
@@ -95,24 +95,24 @@ namespace SimulationEngineWrapper {
 
     public ref class CircuitComponent : public ManagedObject<SimulationEngine::CircuitComponent> {
 
-		public:
+        public:
 
-			CircuitComponent(const int iNodeS, const int iNodeD, bool bIsGround)
+            CircuitComponent(const int iNodeS, const int iNodeD, bool bIsGround)
             : ManagedObject(new SimulationEngine::CircuitComponent(iNodeS, iNodeD, bIsGround)) { ; }
 
-			bool getIsGround() {
+            bool getIsGround() {
                 return m_pInstance->getIsGround();
-			}
-			int getNodeS() {
-				return m_pInstance->getNodeS();
-			}
-			int getNodeD() {
-				return m_pInstance->getNodeD();
-			}
-			double getCurrent() {
-				return m_pInstance->getCurrent();
-			}
-	};
+            }
+            int getNodeS() {
+                return m_pInstance->getNodeS();
+            }
+            int getNodeD() {
+                return m_pInstance->getNodeD();
+            }
+            double getCurrent() {
+                return m_pInstance->getCurrent();
+            }
+    };
 
     public ref class GroundedVoltageSource : public ManagedObject<SimulationEngine::GroundedVoltageSource> {
         

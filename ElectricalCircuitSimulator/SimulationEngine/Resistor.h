@@ -5,20 +5,20 @@
 
 namespace SimulationEngine {
 
-	class Resistor : public CircuitComponent {
+    class Resistor : public CircuitComponent {
 
-		public:
+        public:
 
-			Resistor(const int iNodeS, const int iNodeD, const double dResistance);
+            Resistor(const int iNodeS, const int iNodeD, const double dResistance);
 
-			void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
-			void postStep(Matrix& oVoltageMatrix);
-			void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
+            void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
+            void postStep(Matrix& oVoltageMatrix);
+            void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
 
-		private:
+        private:
 
-			double m_dResistance;
-	};
+            double m_dResistance;
+    };
 
 }
 
