@@ -155,7 +155,8 @@ namespace ElectricalCircuitSimulator
                     do
                     {
                         sFileTextLine = oStreamReader.ReadLine();
-                        if (sFileTextLine != null) {
+                        if (sFileTextLine != null)
+                        {
                             oTextLines.Add(sFileTextLine);
                         }
                     } while (sFileTextLine != null);

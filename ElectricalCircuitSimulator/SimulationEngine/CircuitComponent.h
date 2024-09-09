@@ -5,39 +5,39 @@
 
 namespace SimulationEngine {
 
-	class CircuitComponent {
+    class CircuitComponent {
 
-		public:
+        public:
 
-			CircuitComponent(const int iNodeS, const int iNodeD, bool bIsGround);
+            CircuitComponent(const int iNodeS, const int iNodeD, bool bIsGround);
 
-			bool getIsGround() const {
-				return m_bIsGround;
-			}
-			int getNodeS() const {
-				return m_iNodeS;
-			}
-			int getNodeD() const {
-				return m_iNodeD;
-			}
-			double getCurrent() const {
-				return m_dCurrent;
-			}
-			virtual void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
-			virtual void step(Matrix& oSourceVector);
-			virtual void postStep(Matrix& oVoltageMatrix);
+            bool getIsGround() const {
+                return m_bIsGround;
+            }
+            int getNodeS() const {
+                return m_iNodeS;
+            }
+            int getNodeD() const {
+                return m_iNodeD;
+            }
+            double getCurrent() const {
+                return m_dCurrent;
+            }
+            virtual void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
+            virtual void step(Matrix& oSourceVector);
+            virtual void postStep(Matrix& oVoltageMatrix);
 
-		protected:
+        protected:
 
-			virtual void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
-			virtual void applySourceVectorMatrixStamp(Matrix& oSourceVector);
+            virtual void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
+            virtual void applySourceVectorMatrixStamp(Matrix& oSourceVector);
 
-			bool m_bIsGround;
-			int m_iNodeS; // Source
-			int m_iNodeD; // Destination
-			double m_dComponentResistanceStamp;
-			double m_dCurrent; // Current is positive if flowing from source to destination, negative if the opposite direction
-	};
+            bool m_bIsGround;
+            int m_iNodeS; // Source
+            int m_iNodeD; // Destination
+            double m_dComponentResistanceStamp;
+            double m_dCurrent; // Current is positive if flowing from source to destination, negative if the opposite direction
+    };
 
 }
 

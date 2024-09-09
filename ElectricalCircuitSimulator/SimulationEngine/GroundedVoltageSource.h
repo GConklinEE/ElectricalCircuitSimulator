@@ -5,23 +5,23 @@
 
 namespace SimulationEngine {
 
-	class GroundedVoltageSource : public CircuitComponent {
+    class GroundedVoltageSource : public CircuitComponent {
 
-		public:
+        public:
 
-			GroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance); // iNodeS is assumed to be ground
+            GroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance); // iNodeS is assumed to be ground
 
-			void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
-			void step(Matrix& oSourceVector);
-			void postStep(Matrix& oVoltageMatrix);
-			void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
-			void applySourceVectorMatrixStamp(Matrix& oSourceVector);
+            void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
+            void step(Matrix& oSourceVector);
+            void postStep(Matrix& oVoltageMatrix);
+            void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
+            void applySourceVectorMatrixStamp(Matrix& oSourceVector);
 
-		private:
+        private:
 
-			double m_dVoltage;
-			double m_dResistance;
-	};
+            double m_dVoltage;
+            double m_dResistance;
+    };
 
 }
 

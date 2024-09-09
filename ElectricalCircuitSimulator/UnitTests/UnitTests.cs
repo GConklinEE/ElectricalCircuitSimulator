@@ -8,7 +8,8 @@ namespace UnitTests
 {
     #region Helper Functions
 
-    public class AssertAction() {
+    public class AssertAction()
+    {
         public static void VerifyAssert(Action oAction, string sFailMessage)
         {
             bool bSuccess = false;
@@ -94,7 +95,8 @@ namespace UnitTests
             Assert.IsTrue(oIndexTextBlock.Index == iIndex, "Index property returned unexpected value after being configured with property set method!");
 
             oMainWindow = new MainWindow(true);
-            if (oMainWindow != null) {
+            if (oMainWindow != null)
+            {
                 if (oMainWindow.UI_Error)
                 {
                     Assert.Fail("UI error in MainWindow!");
