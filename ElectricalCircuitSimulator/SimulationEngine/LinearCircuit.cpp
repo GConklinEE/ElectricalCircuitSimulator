@@ -202,10 +202,8 @@ namespace SimulationEngine {
         m_pPLU_Factorization->m_pU->printMatrix();
 #endif
 
-        // Set simulation time to zero
-        m_dTime = 0;
-
-        m_bInitSim = true;
+        m_dTime = 0; // Set simulation time to zero
+        m_bInitSim = true; // Simulation has been initalized
     }
 
     bool LinearCircuit::step() {
@@ -227,7 +225,7 @@ namespace SimulationEngine {
         for (iIterator = 0; iIterator < m_iComponentCount; iIterator++) {
             m_pCircuitComponents[iIterator]->step(*m_pSourceVector);
         }
-    
+
         // Find the new voltage matrix
         m_pVoltageMatrix = Matrix::linearSystemSolver(*m_pSourceVector, *m_pPLU_Factorization);
 
@@ -244,8 +242,8 @@ namespace SimulationEngine {
             m_pCircuitComponents[iIterator]->postStep(*m_pVoltageMatrix);
         }
 
-        m_dTime += m_dTimeStep;
-        m_bRunSim = true;
+        m_dTime += m_dTimeStep; // Update simulation runtime
+        m_bRunSim = true; // Simulation has been run at least 1 time step
 
 #ifdef MATRIX_PRINT
         cout << "Source Vector:" << endl;

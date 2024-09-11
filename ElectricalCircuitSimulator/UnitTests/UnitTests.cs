@@ -43,6 +43,7 @@ namespace UnitTests
         }
     }
 
+    // We need this because UI elements have to be tested from STA threads
     public class STATestMethod : TestMethodAttribute
     {
         public override TestResult[] Execute(ITestMethod testMethod)
@@ -128,8 +129,6 @@ namespace UnitTests
                 AssertAction.VerifyAssert(() => oMainWindow.CloseButton_Click(oButton, oRoutedEventArgs), "Expected running CloseButton_Click to fail, it did not!");
                 AssertAction.CheckAssert(() => oMainWindow.MinimizeButton_Click(oButton, oRoutedEventArgs), "Failed to run MinimizeButton_Click!");
 
-                // The SimulateButton_Click and Timer_Tick events are also testing the simulation engine.
-                // It's a good idea to make sure the default circuit in the UI is one that has all components in it, so the unit tests hit everything.
                 // SimulateButton_Click event toggles states, so call it twice each test
                 AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
                 AssertAction.CheckAssert(() => oMainWindow.SimulateButton_Click(oButton, oRoutedEventArgs), "Failed to run SimulateButton_Click!");
