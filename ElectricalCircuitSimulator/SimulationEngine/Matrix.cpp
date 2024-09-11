@@ -6,6 +6,8 @@ using std::swap;
 using std::invalid_argument;
 using std::exception;
 
+#define ZERO (1e-9) // If a diagonal on the U matrix is less than or equal to this, it is considered a zero
+
 namespace SimulationEngine {
 
     Matrix::Matrix(const int iRows, const int iColumns) {
@@ -185,7 +187,7 @@ namespace SimulationEngine {
             for (iI2 = iI1 + 1; iI2 < iNumRows; ++iI2) {
                 oX.m_oMatrix[iI1][0] -= oPLU.m_pU->m_oMatrix[iI1][iI2] * oX.m_oMatrix[iI2][0];
             }
-            if (fabs(oPLU.m_pU->m_oMatrix[iI1][iI1]) > 1e-9) {
+            if (fabs(oPLU.m_pU->m_oMatrix[iI1][iI1]) > ZERO) {
                 oX.m_oMatrix[iI1][0] /= oPLU.m_pU->m_oMatrix[iI1][iI1];
             } else {
                 oX.m_oMatrix[iI1][0] = 0; // If a diagonal on the U matrix is 0, it's due to the ground node being included in the matrix, and is effectively infinity, resulting in oX = 0 for this row.

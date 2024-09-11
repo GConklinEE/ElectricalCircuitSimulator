@@ -72,7 +72,7 @@ namespace ElectricalCircuitSimulator
                 AxisTitleDistance = 10
             };
 
-            // Create and configure the PlotModel
+            // Create and configure the graphs
             m_oPlotModel1 = new PlotModel { Title = "V(t) Scope" };
             m_oPlotModel2 = new PlotModel { Title = "I(t) Scope" };
             m_oPlotModel1.Axes.Add(xAxisV);
@@ -83,8 +83,6 @@ namespace ElectricalCircuitSimulator
             m_oLineSeriesI = new LineSeries { Title = "I(t) Scope" };
             m_oPlotModel1.Series.Add(m_oLineSeriesV);
             m_oPlotModel2.Series.Add(m_oLineSeriesI);
-
-            // Bind the PlotModel to the PlotView
             xPlotView1.Model = m_oPlotModel1;
             xPlotView2.Model = m_oPlotModel2;
         }
@@ -326,6 +324,7 @@ namespace ElectricalCircuitSimulator
 
         public void TextBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // Load all the info associated with the selected circuit
             m_oLastTextBlock.Background = new SolidColorBrush(Colors.White);
             m_oLastTextBlock.Foreground = new SolidColorBrush(Colors.Black);
             m_oLastTextBlock = sender as IndexTextBlock;
@@ -348,7 +347,7 @@ namespace ElectricalCircuitSimulator
             double result;
             if (double.TryParse(xStepSizeTextBox.Text, out result))
             {
-                if (result <= 0)
+                if (result <= 0) // Invalid value
                 {
                     xStepSizeTextBox.Background = new SolidColorBrush(Colors.Red);
                 }
@@ -358,7 +357,7 @@ namespace ElectricalCircuitSimulator
                     m_dStepSize = result;
                 }
             }
-            else
+            else // Invalid value
             {
                 xStepSizeTextBox.Background = new SolidColorBrush(Colors.Red);
             }
@@ -369,7 +368,7 @@ namespace ElectricalCircuitSimulator
             double result;
             if (double.TryParse(xStopTimeTextBox.Text, out result))
             {
-                if (result <= 0)
+                if (result <= 0) // Invalid value
                 {
                     xStopTimeTextBox.Background = new SolidColorBrush(Colors.Red);
                 }
@@ -379,7 +378,7 @@ namespace ElectricalCircuitSimulator
                     m_dStopTime = result;
                 }
             }
-            else
+            else // Invalid value
             {
                 xStopTimeTextBox.Background = new SolidColorBrush(Colors.Red);
             }
@@ -388,7 +387,7 @@ namespace ElectricalCircuitSimulator
         public void Screen_MouseDown(object sender, MouseButtonEventArgs e)
         {
             MouseButtonState eMouseButtonState;
-            if (e is MouseButtonEventArgsTest)
+            if (e is MouseButtonEventArgsTest) // Unit testing only
             {
                 eMouseButtonState = (e as MouseButtonEventArgsTest).LeftButton;
             }
@@ -396,7 +395,6 @@ namespace ElectricalCircuitSimulator
             {
                 eMouseButtonState = e.LeftButton;
             }
-            // If the left mouse button is pressed, initiate window drag
             if (eMouseButtonState == MouseButtonState.Pressed)
             {
                 this.DragMove();
@@ -438,6 +436,7 @@ namespace ElectricalCircuitSimulator
                         m_oSimulations[m_oLastTextBlock.Index].setTimeStep(m_dStepSize);
                         m_oSimulations[m_oLastTextBlock.Index].initalize();
 
+                        // Setup graphs
                         m_oLineSeriesV.Points.Clear();
                         m_oLineSeriesI.Points.Clear();
 
@@ -473,7 +472,7 @@ namespace ElectricalCircuitSimulator
 
         #region Data Members
 
-        public bool m_bTestMode;
+        public bool m_bTestMode; // Unit testing mode
         private double m_dStepSize;
         private double m_dStopTime;
         private LineSeries m_oLineSeriesV;
