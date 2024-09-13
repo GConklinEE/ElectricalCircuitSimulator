@@ -12,6 +12,7 @@ using System.IO;
 using System.Collections.ObjectModel;
 using SimulationEngineWrapper;
 using OxyPlot.Axes;
+// Comment
 
 namespace ElectricalCircuitSimulator
 {
