@@ -97,12 +97,16 @@ namespace ElectricalCircuitSimulator
             LinearCircuit oLinearCircuit;
             string[] sfiles = new string[0];
             string[] sComponentParams;
-            string sDirectoryPath = @"../../../../../../Circuits";
+            string sDirectoryPath1 = @"../../../../../../Circuits";
+            string sDirectoryPath2 = @"Circuits";
+            string sBlankFilePath1 = "../../../../../../Circuits/Blank.png";
+            string sBlankFilePath2 = "Circuits/Blank.png";
             string sFileType = "*.txt";
             string sFileTextLine;
             string sName;
             double[] dParamValue = new double[2];
             bool bFirstListSelectionConfigured = false;
+            bool bDefaultPathExists;
             int iFile;
             int iLineIndex;
             int iLoadedFile = 0;
@@ -116,9 +120,11 @@ namespace ElectricalCircuitSimulator
             m_oTimeSteps = new Collection<double>();
             m_oStopTimes = new Collection<double>();
 
+            bDefaultPathExists = Directory.Exists(sDirectoryPath1);
+
             try
             {
-                sfiles = Directory.GetFiles(sDirectoryPath, sFileType, SearchOption.AllDirectories);
+                sfiles = Directory.GetFiles((bDefaultPathExists) ? sDirectoryPath1 : sDirectoryPath2, sFileType, SearchOption.AllDirectories);
             }
             catch
             {
@@ -131,7 +137,7 @@ namespace ElectricalCircuitSimulator
 
             try
             {
-                oBlankImage.Source = new BitmapImage(new Uri(System.IO.Path.GetFullPath("../../../../../../Circuits/Blank.png")));
+                oBlankImage.Source = new BitmapImage(new Uri(System.IO.Path.GetFullPath((bDefaultPathExists) ? sBlankFilePath1 : sBlankFilePath2)));
             }
             catch
             {
