@@ -41,17 +41,17 @@ namespace SimulationEngine {
 
         m_dComponentResistanceStamp = 1.0 / m_dResistance;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeS);
-        oConductanceMatrix.setValue(m_iNodeS, m_iNodeS, dResistance + m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeS, m_iNodeS);
+        oConductanceMatrix(m_iNodeS, m_iNodeS) = dResistance + m_dComponentResistanceStamp;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeD);
-        oConductanceMatrix.setValue(m_iNodeS, m_iNodeD, dResistance - m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeS, m_iNodeD);
+        oConductanceMatrix(m_iNodeS, m_iNodeD) = dResistance - m_dComponentResistanceStamp;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeS);
-        oConductanceMatrix.setValue(m_iNodeD, m_iNodeS, dResistance - m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeD, m_iNodeS);
+        oConductanceMatrix(m_iNodeD, m_iNodeS) = dResistance - m_dComponentResistanceStamp;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeD);
-        oConductanceMatrix.setValue(m_iNodeD, m_iNodeD, dResistance + m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeD, m_iNodeD);
+        oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentResistanceStamp;
     };
 
     void GroundedVoltageSource::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
@@ -60,11 +60,11 @@ namespace SimulationEngine {
 
         dComponentCurrentStamp = m_dVoltage / m_dResistance;
 
-        dCurrent = oSourceVector.getValue(m_iNodeS, 0);
-        oSourceVector.setValue(m_iNodeS, 0, dCurrent - dComponentCurrentStamp);
+        dCurrent = oSourceVector(m_iNodeS, 0);
+        oSourceVector(m_iNodeS, 0) = dCurrent - dComponentCurrentStamp;
 
-        dCurrent = oSourceVector.getValue(m_iNodeD, 0);
-        oSourceVector.setValue(m_iNodeD, 0, dCurrent + dComponentCurrentStamp);
+        dCurrent = oSourceVector(m_iNodeD, 0);
+        oSourceVector(m_iNodeD, 0) = dCurrent + dComponentCurrentStamp;
     };
 
     void GroundedVoltageSource::step(Matrix& oSourceVector) {
@@ -72,7 +72,7 @@ namespace SimulationEngine {
     }
 
     void GroundedVoltageSource::postStep(Matrix& oVoltageMatrix) {
-        m_dCurrent = (m_dVoltage - (oVoltageMatrix.getValue(m_iNodeD, 0) - oVoltageMatrix.getValue(m_iNodeS, 0))) / m_dResistance;
+        m_dCurrent = (m_dVoltage - (oVoltageMatrix(m_iNodeD, 0) - oVoltageMatrix(m_iNodeS, 0))) / m_dResistance;
     }
 
 }

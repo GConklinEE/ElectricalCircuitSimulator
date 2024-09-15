@@ -39,17 +39,17 @@ namespace SimulationEngine {
 
         m_dComponentResistanceStamp = (2.0 * m_dCapacitance) / dTimeStep;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeS);
-        oConductanceMatrix.setValue(m_iNodeS, m_iNodeS, dResistance + m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeS, m_iNodeS);
+        oConductanceMatrix(m_iNodeS, m_iNodeS) = dResistance + m_dComponentResistanceStamp;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeD);
-        oConductanceMatrix.setValue(m_iNodeS, m_iNodeD, dResistance - m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeS, m_iNodeD);
+        oConductanceMatrix(m_iNodeS, m_iNodeD) = dResistance - m_dComponentResistanceStamp;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeS);
-        oConductanceMatrix.setValue(m_iNodeD, m_iNodeS, dResistance - m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeD, m_iNodeS);
+        oConductanceMatrix(m_iNodeD, m_iNodeS) = dResistance - m_dComponentResistanceStamp;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeD);
-        oConductanceMatrix.setValue(m_iNodeD, m_iNodeD, dResistance + m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeD, m_iNodeD);
+        oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentResistanceStamp;
     };
 
     void Capacitor::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
@@ -57,11 +57,11 @@ namespace SimulationEngine {
 
         m_dCurrent = m_dComponentResistanceStamp * (m_dVoltageDelta)+m_dCurrent; // 2C/dt*v(t-1) + i(t-1)
 
-        dCurrent = oSourceVector.getValue(m_iNodeS, 0);
-        oSourceVector.setValue(m_iNodeS, 0, dCurrent + m_dCurrent);
+        dCurrent = oSourceVector(m_iNodeS, 0);
+        oSourceVector(m_iNodeS, 0) = dCurrent + m_dCurrent;
 
-        dCurrent = oSourceVector.getValue(m_iNodeD, 0);
-        oSourceVector.setValue(m_iNodeD, 0, dCurrent - m_dCurrent);
+        dCurrent = oSourceVector(m_iNodeD, 0);
+        oSourceVector(m_iNodeD, 0) = dCurrent - m_dCurrent;
     };
 
     void Capacitor::step(Matrix& oSourceVector) { // Trapezoidal integration
@@ -69,7 +69,7 @@ namespace SimulationEngine {
     }
 
     void Capacitor::postStep(Matrix& oVoltageMatrix) {
-        m_dVoltageDelta = (oVoltageMatrix.getValue(m_iNodeS, 0) - oVoltageMatrix.getValue(m_iNodeD, 0));
+        m_dVoltageDelta = (oVoltageMatrix(m_iNodeS, 0) - oVoltageMatrix(m_iNodeD, 0));
         m_dCurrent = m_dComponentResistanceStamp * (m_dVoltageDelta) - m_dCurrent; // i(t) = 2C/dt*v(t) - 2C/dt*v(t-1) - i(t-1), m_dCurrent = 2C/dt*v(t-1) + i(t-1)
     }
 

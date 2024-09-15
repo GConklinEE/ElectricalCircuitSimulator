@@ -13,19 +13,17 @@
 using namespace SimulationEngine;
 using std::cout;
 using std::endl;
+using std::make_unique;
 
 void SimulationIntegrationTestSeriesRR()
 {
     bool bDone;
     int iSteps = 0;
     LinearCircuit* pLinearCircuit = new LinearCircuit(3);
-    GroundedVoltageSource* pGroundedVoltageSource = new GroundedVoltageSource(2, 1, 30, 10); // Node 2 is ground
-    Resistor* pResistor1 = new Resistor(1, 0, 10);
-    Resistor* pResistor2 = new Resistor(0, 2, 10);
 
-    pLinearCircuit->addComponent(pGroundedVoltageSource);
-    pLinearCircuit->addComponent(pResistor1);
-    pLinearCircuit->addComponent(pResistor2);
+    pLinearCircuit->addComponent(make_unique<GroundedVoltageSource>(2, 1, 30, 10)); // Node 2 is ground
+    pLinearCircuit->addComponent(make_unique<Resistor>(1, 0, 10));
+    pLinearCircuit->addComponent(make_unique<Resistor>(0, 2, 10));
     pLinearCircuit->setStopTime(10);
     pLinearCircuit->setTimeStep(1);
     pLinearCircuit->initalize();
@@ -47,9 +45,6 @@ void SimulationIntegrationTestSeriesRR()
     cout << "Current through component 2 (expect 1): " << pLinearCircuit->getCurrent(2) << endl;
 
     delete pLinearCircuit;
-    delete pGroundedVoltageSource;
-    delete pResistor1;
-    delete pResistor2;
 }
 
 void SimulationIntegrationTestSeriesRC()
@@ -57,13 +52,10 @@ void SimulationIntegrationTestSeriesRC()
     bool bDone;
     int iSteps = 0;
     LinearCircuit* pLinearCircuit = new LinearCircuit(3);
-    GroundedVoltageSource* pGroundedVoltageSource = new GroundedVoltageSource(2, 1, 30, 10); // Node 2 is ground
-    Resistor* pResistor = new Resistor(1, 0, 10);
-    Capacitor* pCapacitor = new Capacitor(0, 2, 0.2);
 
-    pLinearCircuit->addComponent(pGroundedVoltageSource);
-    pLinearCircuit->addComponent(pResistor);
-    pLinearCircuit->addComponent(pCapacitor);
+    pLinearCircuit->addComponent(make_unique<GroundedVoltageSource>(2, 1, 30, 10)); // Node 2 is ground
+    pLinearCircuit->addComponent(make_unique<Resistor>(1, 0, 10));
+    pLinearCircuit->addComponent(make_unique<Capacitor>(0, 2, 0.2));
     pLinearCircuit->setStopTime(10);
     pLinearCircuit->setTimeStep(1);
     pLinearCircuit->initalize();
@@ -85,9 +77,6 @@ void SimulationIntegrationTestSeriesRC()
     cout << "Current through component 2 (expect 0.13888): " << pLinearCircuit->getCurrent(2) << endl;
 
     delete pLinearCircuit;
-    delete pGroundedVoltageSource;
-    delete pResistor;
-    delete pCapacitor;
 }
 
 void SimulationIntegrationTestSeriesRL()
@@ -95,13 +84,10 @@ void SimulationIntegrationTestSeriesRL()
     bool bDone;
     int iSteps = 0;
     LinearCircuit* pLinearCircuit = new LinearCircuit(3);
-    GroundedVoltageSource* pGroundedVoltageSource = new GroundedVoltageSource(2, 1, 30, 10); // Node 2 is ground
-    Resistor* pResistor = new Resistor(1, 0, 10);
-    Inductor* pInductor = new Inductor(0, 2, 50);
 
-    pLinearCircuit->addComponent(pGroundedVoltageSource);
-    pLinearCircuit->addComponent(pResistor);
-    pLinearCircuit->addComponent(pInductor);
+    pLinearCircuit->addComponent(make_unique<GroundedVoltageSource>(2, 1, 30, 10)); // Node 2 is ground
+    pLinearCircuit->addComponent(make_unique<Resistor>(1, 0, 10));
+    pLinearCircuit->addComponent(make_unique<Inductor>(0, 2, 50));
     pLinearCircuit->setStopTime(10);
     pLinearCircuit->setTimeStep(1);
     pLinearCircuit->initalize();
@@ -123,9 +109,6 @@ void SimulationIntegrationTestSeriesRL()
     cout << "Current through component 2 (expect 1.46748): " << pLinearCircuit->getCurrent(2) << endl;
 
     delete pLinearCircuit;
-    delete pGroundedVoltageSource;
-    delete pResistor;
-    delete pInductor;
 }
 
 int main()

@@ -11,6 +11,8 @@
 using namespace System;
 using namespace SimulationEngine;
 
+using std::make_unique;
+
 namespace SimulationEngineWrapper {
 
     template<class T>
@@ -33,7 +35,7 @@ namespace SimulationEngineWrapper {
                 }
             }
 
-            T* getInstance() {
+            T& getInstance() {
                 return m_pInstance;
             }
 
@@ -72,13 +74,14 @@ namespace SimulationEngineWrapper {
             void setValue(const int iRow, const int iColumn, const double dValue) {
                 m_pInstance->setValue(iRow, iColumn, dValue);
             }
+            void swapRows(const int iRow1, const int iRow2) {
+                m_pInstance->swapRows(iRow1, iRow2);
+            }
+            void swapValues(const int iRow1, const int iColumn1, const int iRow2, const int iColumn2) {
+                m_pInstance->swapValues(iRow1, iColumn1, iRow2, iColumn2);
+            }
             void clear() {
                 m_pInstance->clear();
-            }
-            void clone() {
-                SimulationEngine::Matrix* pClone;
-                pClone = m_pInstance->clone();
-                delete pClone;
             }
             void printMatrix() {
                 m_pInstance->printMatrix();
@@ -138,20 +141,16 @@ namespace SimulationEngineWrapper {
             : ManagedObject(new SimulationEngine::LinearCircuit(iNumComponents)) { ; }
 
             int addResistor(const int iNodeS, const int iNodeD, const double dResistance) {
-                SimulationEngine::Resistor* pResistor = new SimulationEngine::Resistor(iNodeS, iNodeD, dResistance);
-                return m_pInstance->addComponent(pResistor);
+                return m_pInstance->addComponent(make_unique<SimulationEngine::Resistor>(iNodeS, iNodeD, dResistance));
             }
             int addInductor(const int iNodeS, const int iNodeD, const double dInductance) {
-                SimulationEngine::Inductor* pInductor = new SimulationEngine::Inductor(iNodeS, iNodeD, dInductance);
-                return m_pInstance->addComponent(pInductor);
+                return m_pInstance->addComponent(make_unique<SimulationEngine::Inductor>(iNodeS, iNodeD, dInductance));
             }
             int addCapacitor(const int iNodeS, const int iNodeD, const double dCapacitance) {
-                SimulationEngine::Capacitor* pCapacitor = new::Capacitor(iNodeS, iNodeD, dCapacitance);
-                return m_pInstance->addComponent(pCapacitor);
+                return m_pInstance->addComponent(make_unique<SimulationEngine::Capacitor>(iNodeS, iNodeD, dCapacitance));
             }
             int addGroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance) {
-                SimulationEngine::GroundedVoltageSource* pGroundedVoltageSource = new SimulationEngine::GroundedVoltageSource(iNodeS, iNodeD, dVoltage, dResistance);
-                return m_pInstance->addComponent(pGroundedVoltageSource);
+                return m_pInstance->addComponent(make_unique<SimulationEngine::GroundedVoltageSource>(iNodeS, iNodeD, dVoltage, dResistance));
             }
             void setStopTime(const double dStopTime) {
                 m_pInstance->setStopTime(dStopTime);

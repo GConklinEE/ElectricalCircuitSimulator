@@ -5,18 +5,24 @@
 #include <vector>
 
 using std::vector;
+using std::unique_ptr;
 
 namespace SimulationEngine {
 
-    class LinearCircuit {
+    class LinearCircuit final {
 
         public:
 
             LinearCircuit(const int iNumComponents);
+            LinearCircuit(const LinearCircuit&) = delete;
+            LinearCircuit(LinearCircuit&&) = delete;
 
             ~LinearCircuit();
 
-            int addComponent(CircuitComponent* pCircuitComponent);
+            LinearCircuit& operator=(const LinearCircuit&) = delete;
+            LinearCircuit& operator=(LinearCircuit&&) = delete;
+
+            int addComponent(unique_ptr<CircuitComponent> pCircuitComponent);
             void setStopTime(const double dStopTime);
             void setTimeStep(const double dTimeStep);
             double getTime() const;
@@ -27,10 +33,10 @@ namespace SimulationEngine {
 
         private:
 
-            CircuitComponent** m_pCircuitComponents;
+            unique_ptr<CircuitComponent>* m_pCircuitComponents;
             Matrix* m_pConductanceMatrix;
             Matrix* m_pSourceVector;
-            Matrix* m_pVoltageMatrix;
+            Matrix* m_pVoltageVector;
             PLU_Factorization* m_pPLU_Factorization;
             vector<int> m_oNodeList;
             int m_iMaxComponentCount;
