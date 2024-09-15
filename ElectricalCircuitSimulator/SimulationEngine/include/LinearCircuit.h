@@ -4,39 +4,37 @@
 #include "CircuitComponent.h"
 #include <vector>
 
-using std::vector;
-
 namespace SimulationEngine {
 
-    class LinearCircuit {
+    class LinearCircuit final {
 
         public:
 
-            LinearCircuit(const int iNumComponents);
+            LinearCircuit(const size_t iNumComponents);
 
-            ~LinearCircuit();
-
-            int addComponent(CircuitComponent* pCircuitComponent);
+            size_t addComponent(std::unique_ptr<CircuitComponent> pCircuitComponent);
             void setStopTime(const double dStopTime);
             void setTimeStep(const double dTimeStep);
             double getTime() const;
-            double getVoltage(const int iNode) const;
-            double getCurrent(const int iComponentIndex) const;
+            double getVoltage(const size_t iNode) const;
+            double getCurrent(const size_t iComponentIndex) const;
             void initalize();
             bool step();
 
         private:
 
-            CircuitComponent** m_pCircuitComponents;
-            Matrix* m_pConductanceMatrix;
-            Matrix* m_pSourceVector;
-            Matrix* m_pVoltageMatrix;
-            PLU_Factorization* m_pPLU_Factorization;
-            vector<int> m_oNodeList;
-            int m_iMaxComponentCount;
-            int m_iComponentCount;
-            int m_iMaxNode;
-            int m_iGroundNode;
+            void solver();
+
+            std::unique_ptr<std::unique_ptr<CircuitComponent>[]> m_pCircuitComponents;
+            std::unique_ptr<Matrix> m_pConductanceMatrix;
+            std::unique_ptr<Matrix> m_pSourceVector;
+            std::unique_ptr<Matrix> m_pVoltageVector;
+            std::unique_ptr<PLU_Factorization> m_pPLU;
+            std::vector<size_t> m_oNodeList;
+            size_t m_iMaxComponentCount;
+            size_t m_iComponentCount;
+            size_t m_iMaxNode;
+            size_t m_iGroundNode;
             double m_dStopTime;
             double m_dTimeStep;
             double m_dTime;

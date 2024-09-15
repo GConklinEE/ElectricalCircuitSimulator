@@ -4,44 +4,43 @@ using std::cout;
 using std::endl;
 using std::invalid_argument;
 using std::exception;
+using std::move;
+using std::vector;
+using std::unique_ptr;
+using std::make_unique;
+
+#define ZERO (1e-9) // If a diagonal on the U matrix is less than or equal to this, it is considered a zero
 
 namespace SimulationEngine {
 
-    LinearCircuit::LinearCircuit(const int iNumComponents) {
+    LinearCircuit::LinearCircuit(const size_t iNumComponents) :
+        m_pConductanceMatrix(make_unique<Matrix>()),
+        m_pSourceVector(make_unique<Matrix>()),
+        m_pVoltageVector(make_unique<Matrix>()),
+        m_pPLU(make_unique<PLU_Factorization>()),
+        m_oNodeList(vector<size_t>(0)),
+        m_bHasGround(false),
+        m_iComponentCount(0),
+        m_iMaxNode(0),
+        m_iGroundNode(0),
+        m_dStopTime(0),
+        m_dTimeStep(0),
+        m_dTime(0),
+        m_bInitSim(false),
+        m_bRunSim(false)
+    {
         if (iNumComponents <= 0) {
             cout << "Circuit must have a positive and non-zero number of components!" << endl;
             throw exception("Circuit must have a positive and non-zero number of components!");
         }
         m_iMaxComponentCount = iNumComponents;
-        m_pCircuitComponents = new CircuitComponent*[m_iMaxComponentCount]; // We have to use statically allocated arrays of objects due to using the C++ CLI/CLR
-        m_pConductanceMatrix = new Matrix();
-        m_pSourceVector = new Matrix();
-        m_pVoltageMatrix = new Matrix();
-        m_pPLU_Factorization = new PLU_Factorization();
-        m_oNodeList = vector<int>(0);
-        m_bHasGround = false;
-        m_iComponentCount = 0;
-        m_iMaxNode = 0;
-        m_iGroundNode = 0;
-        m_dStopTime = 0;
-        m_dTimeStep = 0;
-        m_dTime = 0;
-        m_bInitSim = false;
-        m_bRunSim = false;
+        m_pCircuitComponents = make_unique<unique_ptr<CircuitComponent>[]>(m_iMaxComponentCount); // We have to use statically allocated arrays of objects due to using the C++ CLI/CLR
     }
 
-    LinearCircuit::~LinearCircuit() {
-        delete[] m_pCircuitComponents;
-        delete m_pConductanceMatrix;
-        delete m_pSourceVector;
-        delete m_pVoltageMatrix;
-        delete m_pPLU_Factorization;
-    }
-
-    int LinearCircuit::addComponent(CircuitComponent* pCircuitComponent) {
-        int iNodeIterator;
-        int iNodeS = pCircuitComponent->getNodeS();
-        int iNodeD = pCircuitComponent->getNodeD();
+    size_t LinearCircuit::addComponent(unique_ptr<CircuitComponent> pCircuitComponent) {
+        size_t iNodeIterator;
+        size_t iNodeS = pCircuitComponent->getNodeS();
+        size_t iNodeD = pCircuitComponent->getNodeD();
         bool bFoundNodeS = false;
         bool bFoundNodeD = false;
 
@@ -60,7 +59,7 @@ namespace SimulationEngine {
                 m_bHasGround = true;
                 m_iGroundNode = pCircuitComponent->getNodeS();
             }
-            m_pCircuitComponents[m_iComponentCount] = pCircuitComponent;
+            m_pCircuitComponents[m_iComponentCount] = move(pCircuitComponent);
             m_iComponentCount++;
         }
         for (iNodeIterator = 0; iNodeIterator < (int)m_oNodeList.size(); iNodeIterator++) {
@@ -109,11 +108,7 @@ namespace SimulationEngine {
         return m_dTime;
     }
 
-    double LinearCircuit::getVoltage(const int iNode) const {
-        if (iNode < 0) {
-            cout << "Node values must be greater than or equal to 0!" << endl;
-            throw invalid_argument("Node values must be greater than or equal to 0!");
-        }
+    double LinearCircuit::getVoltage(const size_t iNode) const {
         if (iNode > m_iMaxNode) {
             cout << "Requested node does not exist!" << endl;
             throw invalid_argument("Requested node does not exist!");
@@ -123,10 +118,10 @@ namespace SimulationEngine {
             throw exception("Cannot read voltages from a circuit that has not been simulated!");
         }
 
-        return m_pVoltageMatrix->getValue(iNode, 0);
+        return (*m_pVoltageVector)(iNode, 0);
     }
 
-    double LinearCircuit::getCurrent(const int iComponentIndex) const {
+    double LinearCircuit::getCurrent(const size_t iComponentIndex) const {
         if (iComponentIndex >= m_iComponentCount) {
             cout << "Requested component does not exist!" << endl;
             throw invalid_argument("Requested component does not exist!");
@@ -140,8 +135,8 @@ namespace SimulationEngine {
     }
 
     void LinearCircuit::initalize() {
-        int iIterator;
-        int iNode;
+        size_t iIterator;
+        size_t iNode;
         bool bFoundIndex;
 
         // Check for valid time step and stop time. Check that there are actually nodes in the circuit to simulate. Check that a ground exists.
@@ -173,9 +168,9 @@ namespace SimulationEngine {
         }
 
         // Declare blank matrices.
-        m_pConductanceMatrix = new Matrix(m_iMaxNode + 1, m_iMaxNode + 1);
-        m_pSourceVector = new Matrix(m_iMaxNode + 1, 1);
-        m_pVoltageMatrix = new Matrix(m_iMaxNode + 1, 1);
+        m_pConductanceMatrix = make_unique<Matrix>(m_iMaxNode + 1, m_iMaxNode + 1);
+        m_pSourceVector = make_unique<Matrix>(m_iMaxNode + 1, 1);
+        m_pVoltageVector = make_unique<Matrix>(m_iMaxNode + 1, 1);
 
         // Build the conductance and initial source vector matrices
         for (iIterator = 0; iIterator < m_iComponentCount; iIterator++) {
@@ -183,23 +178,23 @@ namespace SimulationEngine {
         }
 
         // Factor the conductance matrix
-        m_pPLU_Factorization = m_pConductanceMatrix->runPLU_Factorization();
+        m_pPLU = make_unique<PLU_Factorization>(*m_pConductanceMatrix);
 
 #ifdef MATRIX_PRINT
         // Print out the matrices
         cout << "Conductance Matrix:" << endl;
-        m_pConductanceMatrix->printMatrix();
+        cout << m_pConductanceMatrix->printMatrix();
         cout << "Source Vector:" << endl;
-        m_pSourceVector->printMatrix();
+        cout << m_pSourceVector->printMatrix();
         cout << "PLU Factorization Matrixes:" << endl;
         cout << "L:" << endl;
-        m_pPLU_Factorization->m_pL->printMatrix();
+        cout << m_pPLU->getL().printMatrix();
         cout << "P:" << endl;
-        m_pPLU_Factorization->m_pP->printMatrix();
+        cout << m_pPLU->getP().printMatrix();
         cout << "Q:" << endl;
-        m_pPLU_Factorization->m_pQ->printMatrix();
+        cout << m_pPLU->getQ().printMatrix();
         cout << "U:" << endl;
-        m_pPLU_Factorization->m_pU->printMatrix();
+        cout << m_pPLU->getU().printMatrix();
 #endif
 
         m_dTime = 0; // Set simulation time to zero
@@ -207,7 +202,7 @@ namespace SimulationEngine {
     }
 
     bool LinearCircuit::step() {
-        int iIterator;
+        size_t iIterator;
         double dNormalizationFactor;
 
         if (m_bInitSim == false) {
@@ -227,19 +222,19 @@ namespace SimulationEngine {
         }
 
         // Find the new voltage matrix
-        m_pVoltageMatrix = Matrix::linearSystemSolver(*m_pSourceVector, *m_pPLU_Factorization);
+        solver();
 
         // Check to see if the voltage matrix requires normalization
-        dNormalizationFactor = -m_pVoltageMatrix->getValue(m_iGroundNode, 0);
+        dNormalizationFactor = -(*m_pVoltageVector)(m_iGroundNode, 0);
         if (dNormalizationFactor != 0) {
             for (iIterator = 0; iIterator <= m_iMaxNode; iIterator++) {
-                m_pVoltageMatrix->setValue(iIterator, 0, (m_pVoltageMatrix->getValue(iIterator, 0) + dNormalizationFactor));
+                (*m_pVoltageVector)(iIterator, 0) = ((*m_pVoltageVector)(iIterator, 0) + dNormalizationFactor);
             }
         }
 
         // Run all component post-step functions 
         for (iIterator = 0; iIterator < m_iComponentCount; iIterator++) {
-            m_pCircuitComponents[iIterator]->postStep(*m_pVoltageMatrix);
+            m_pCircuitComponents[iIterator]->postStep(*m_pVoltageVector);
         }
 
         m_dTime += m_dTimeStep; // Update simulation runtime
@@ -249,13 +244,65 @@ namespace SimulationEngine {
         cout << "Source Vector:" << endl;
         m_pSourceVector->printMatrix();
         cout << "Voltage Matrix:" << endl;
-        m_pVoltageMatrix->printMatrix();
+        m_pVoltageVector->printMatrix();
 #endif
 
         if (m_dTime >= m_dStopTime)
             return true; // Simulation is done
         else
             return false;
+    }
+
+    void LinearCircuit::solver() {
+        int iI1;
+        size_t iI2;
+        size_t iIndex;
+        size_t iNumRows = m_pSourceVector->getNumRows();
+        Matrix oX(iNumRows, 1); // UX = Y
+        Matrix oY(iNumRows, 1); // LY = B_Permuted
+        Matrix oB_Permuted(iNumRows, 1);
+
+        // Apply row permutations to B to get B_Permuted
+        for (iI1 = 0; iI1 < iNumRows; ++iI1) {
+            iIndex = (size_t)round(m_pPLU->getP()(iI1, 0));
+            oB_Permuted(iI1, 0) = (*m_pSourceVector)(iIndex, 0);
+        }
+
+        // Forward substitution to solve LY = B_Permuted
+        for (iI1 = 0; iI1 < iNumRows; ++iI1) {
+            oY(iI1, 0) = oB_Permuted(iI1, 0);
+            for (iI2 = 0; iI2 < iI1; ++iI2) {
+                oY(iI1, 0) -= m_pPLU->getL()(iI1, iI2) * oY(iI2, 0);
+            }
+        }
+
+        // Backward substitution to solve UX = Y
+        for (iI1 = (int)iNumRows - 1; iI1 >= 0; --iI1) {
+            oX(iI1, 0) = oY(iI1, 0);
+            for (iI2 = iI1 + 1; iI2 < iNumRows; ++iI2) {
+                oX(iI1, 0) -= m_pPLU->getU()(iI1, iI2) * oX(iI2, 0);
+            }
+            if (fabs(m_pPLU->getU()(iI1, iI1)) > ZERO) {
+                oX(iI1, 0) /= m_pPLU->getU()(iI1, iI1);
+            } else {
+                oX(iI1, 0) = 0; // If a diagonal on the U matrix is 0, it's due to the ground node being included in the matrix, and is effectively infinity, resulting in oX = 0 for this row.
+            }
+        }
+
+        // Apply column permutations to X using Q to get X_Final
+        for (iI1 = 0; iI1 < iNumRows; ++iI1) {
+            iIndex = (size_t)round(m_pPLU->getQ()(iI1, 0));
+            (*m_pVoltageVector)(iIndex, 0) = oX(iI1, 0);
+        }
+
+#ifdef MATRIX_PRINT
+        cout << "X Vector:" << endl;
+        cout << oX.printMatrix();
+        cout << "Y Vector:" << endl;
+        cout << oY.printMatrix();
+        cout << "B Permuted Vector:" << endl;
+        cout << oB_Permuted.printMatrix();
+#endif
     }
 
 }

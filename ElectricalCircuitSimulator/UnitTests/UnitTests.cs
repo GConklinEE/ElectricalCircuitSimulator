@@ -165,7 +165,13 @@ namespace UnitTests
             int iColumn;
 
             Matrix oMatrix = new Matrix();
-            oMatrix = new Matrix(2, 6);
+            oMatrix = new Matrix(3, 6);
+            oMatrix.setValue(0, 1, 1);
+            oMatrix.setValue(2, 3, 2);
+            oMatrix.swapRows(0, 2);
+            Assert.IsTrue(oMatrix.getValue(0, 3) == 2 && oMatrix.getValue(2, 1) == 1, "Incorrect matrix values! Expected row swap!");
+            oMatrix.swapValues(0, 3, 2, 1);
+            Assert.IsTrue(oMatrix.getValue(0, 3) == 1 && oMatrix.getValue(2, 1) == 2, "Incorrect matrix values! Expected value swap!");
             AssertAction.VerifyAssert(() => oMatrix = new Matrix(0, 5), "Expected 'Matrix dimensions must be positive and non-zero!' error, did not get it!");
             AssertAction.VerifyAssert(() => oMatrix = new Matrix(6, 0), "Expected 'Matrix dimensions must be positive and non-zero!' error, did not get it!");
             AssertAction.VerifyAssert(() => oMatrix = new Matrix(-6, 6), "Expected 'Matrix dimensions must be positive and non-zero!' error, did not get it!");
@@ -202,7 +208,6 @@ namespace UnitTests
                     Assert.IsTrue((int)Math.Round(oMatrix.getValue(iRow, iColumn)) == 0, "Incorrect matrix value! Expected 0");
                 }
             }
-            oMatrix.clone();
             oMatrix.Dispose();
         }
 
@@ -220,8 +225,7 @@ namespace UnitTests
             CircuitComponent oCircuitComponent;
 
             AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(5, 5, false), "Expected 'Node values must not be the same!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(0, -6, false), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(-5, 6, false), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(0, 0, false), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
 
             oCircuitComponent = new CircuitComponent(0, 5, false);
             Assert.IsTrue(oCircuitComponent.getIsGround() == false, "Incorrect value! Expected false");

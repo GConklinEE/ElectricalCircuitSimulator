@@ -14,8 +14,9 @@ using std::invalid_argument;
 
 namespace SimulationEngine {
 
-    Resistor::Resistor(const int iNodeS, const int iNodeD, const double dResistance)
-    : CircuitComponent(iNodeS, iNodeD, false) {
+    Resistor::Resistor(const size_t iNodeS, const size_t iNodeD, const double dResistance) :
+        CircuitComponent(iNodeS, iNodeD, false)
+    {
         if (dResistance <= 0) {
             cout << "Resistance value must be greater than 0!" << endl;
             throw invalid_argument("Resistance value must be greater than 0!");
@@ -33,21 +34,21 @@ namespace SimulationEngine {
 
         m_dComponentResistanceStamp = 1.0 / m_dResistance;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeS);
-        oConductanceMatrix.setValue(m_iNodeS, m_iNodeS, dResistance + m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeS, m_iNodeS);
+        oConductanceMatrix(m_iNodeS, m_iNodeS) = dResistance + m_dComponentResistanceStamp;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeS, m_iNodeD);
-        oConductanceMatrix.setValue(m_iNodeS, m_iNodeD, dResistance - m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeS, m_iNodeD);
+        oConductanceMatrix(m_iNodeS, m_iNodeD) = dResistance - m_dComponentResistanceStamp;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeS);
-        oConductanceMatrix.setValue(m_iNodeD, m_iNodeS, dResistance - m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeD, m_iNodeS);
+        oConductanceMatrix(m_iNodeD, m_iNodeS) = dResistance - m_dComponentResistanceStamp;
 
-        dResistance = oConductanceMatrix.getValue(m_iNodeD, m_iNodeD);
-        oConductanceMatrix.setValue(m_iNodeD, m_iNodeD, dResistance + m_dComponentResistanceStamp);
+        dResistance = oConductanceMatrix(m_iNodeD, m_iNodeD);
+        oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentResistanceStamp;
     };
 
     void Resistor::postStep(Matrix& oVoltageMatrix) {
-        m_dCurrent = (oVoltageMatrix.getValue(m_iNodeS, 0) - oVoltageMatrix.getValue(m_iNodeD, 0)) / m_dResistance;
+        m_dCurrent = (oVoltageMatrix(m_iNodeS, 0) - oVoltageMatrix(m_iNodeD, 0)) / m_dResistance;
     }
 
 }
