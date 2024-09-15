@@ -11,48 +11,48 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Matrix.h">
+    <ClInclude Include="include\Capacitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Capacitor.h">
+    <ClInclude Include="include\CircuitComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Inductor.h">
+    <ClInclude Include="include\GroundedVoltageSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Resistor.h">
+    <ClInclude Include="include\Inductor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CircuitComponent.h">
+    <ClInclude Include="include\LinearCircuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GroundedVoltageSource.h">
+    <ClInclude Include="include\Matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LinearCircuit.h">
+    <ClInclude Include="include\Resistor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Matrix.cpp">
+    <ClCompile Include="src\Resistor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CircuitComponent.cpp">
+    <ClCompile Include="src\Capacitor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Resistor.cpp">
+    <ClCompile Include="src\CircuitComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Capacitor.cpp">
+    <ClCompile Include="src\GroundedVoltageSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Inductor.cpp">
+    <ClCompile Include="src\Inductor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GroundedVoltageSource.cpp">
+    <ClCompile Include="src\LinearCircuit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LinearCircuit.cpp">
+    <ClCompile Include="src\Matrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

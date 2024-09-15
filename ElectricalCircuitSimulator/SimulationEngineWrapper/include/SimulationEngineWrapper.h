@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../SimulationEngine/Capacitor.h"
-#include "../SimulationEngine/CircuitComponent.h"
-#include "../SimulationEngine/GroundedVoltageSource.h"
-#include "../SimulationEngine/Inductor.h"
-#include "../SimulationEngine/LinearCircuit.h"
-#include "../SimulationEngine/Matrix.h"
-#include "../SimulationEngine/Resistor.h"
+#include "Capacitor.h"
+#include "CircuitComponent.h"
+#include "GroundedVoltageSource.h"
+#include "Inductor.h"
+#include "LinearCircuit.h"
+#include "Matrix.h"
+#include "Resistor.h"
 
 using namespace System;
 using namespace SimulationEngine;
