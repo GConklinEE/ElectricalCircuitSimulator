@@ -10,6 +10,24 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Capacitor.h" />
+    <ClInclude Include="include\CircuitComponent.h" />
+    <ClInclude Include="include\GroundedVoltageSource.h" />
+    <ClInclude Include="include\Inductor.h" />
+    <ClInclude Include="include\LinearCircuit.h" />
+    <ClInclude Include="include\Matrix.h" />
+    <ClInclude Include="include\Resistor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Capacitor.cpp" />
+    <ClCompile Include="src\CircuitComponent.cpp" />
+    <ClCompile Include="src\GroundedVoltageSource.cpp" />
+    <ClCompile Include="src\Inductor.cpp" />
+    <ClCompile Include="src\LinearCircuit.cpp" />
+    <ClCompile Include="src\Matrix.cpp" />
+    <ClCompile Include="src\Resistor.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -52,6 +70,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -69,6 +88,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -78,24 +98,6 @@
       <EnableUAC>false</EnableUAC>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="Capacitor.h" />
-    <ClInclude Include="CircuitComponent.h" />
-    <ClInclude Include="Inductor.h" />
-    <ClInclude Include="LinearCircuit.h" />
-    <ClInclude Include="Matrix.h" />
-    <ClInclude Include="Resistor.h" />
-    <ClInclude Include="GroundedVoltageSource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Capacitor.cpp" />
-    <ClCompile Include="CircuitComponent.cpp" />
-    <ClCompile Include="Inductor.cpp" />
-    <ClCompile Include="LinearCircuit.cpp" />
-    <ClCompile Include="Matrix.cpp" />
-    <ClCompile Include="Resistor.cpp" />
-    <ClCompile Include="GroundedVoltageSource.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

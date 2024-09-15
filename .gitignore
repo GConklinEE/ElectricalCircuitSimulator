@@ -1,5 +1,6 @@
 # Visual Studio git ignore
 .vs/
+out/
 obj/
 bin/
 x64/
