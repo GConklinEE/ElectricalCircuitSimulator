@@ -11,9 +11,9 @@ namespace SimulationEngine {
 
             Resistor(const int iNodeS, const int iNodeD, const double dResistance);
 
-            void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
-            void postStep(Matrix& oVoltageMatrix);
-            void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
+            void initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep);
+            void postStep(Matrix<double>& oVoltageMatrix);
+            void applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep);
 
         private:
 

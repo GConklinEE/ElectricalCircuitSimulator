@@ -7,6 +7,7 @@
 #include "LinearCircuit.h"
 #include "Matrix.h"
 #include "Resistor.h"
+#include <iostream>
 
 using namespace System;
 using namespace SimulationEngine;
@@ -45,22 +46,22 @@ namespace SimulationEngineWrapper {
 
     };
         
-    public ref class PLU_Factorization : public ManagedObject<SimulationEngine::PLU_Factorization> {
+    public ref class PLU_Factorization : public ManagedObject<SimulationEngine::PLU_Factorization<double>> {
 
         public:
 
             PLU_Factorization() 
-            : ManagedObject(new SimulationEngine::PLU_Factorization()) { ; }
+            : ManagedObject(new SimulationEngine::PLU_Factorization<double>()) { ; }
     };
 
-    public ref class Matrix : public ManagedObject<SimulationEngine::Matrix> {
+    public ref class Matrix : public ManagedObject<SimulationEngine::Matrix<double>> {
 
         public:
 
             Matrix()
-            : ManagedObject(new SimulationEngine::Matrix()) { ; }
+            : ManagedObject(new SimulationEngine::Matrix<double>()) { ; }
             Matrix(const int iRows, const int iColumns)
-            : ManagedObject(new SimulationEngine::Matrix(iRows, iColumns)) { ; }
+            : ManagedObject(new SimulationEngine::Matrix<double>(iRows, iColumns)) { ; }
 
             int getNumRows() { 
                 return m_pInstance->getNumRows();
@@ -69,10 +70,10 @@ namespace SimulationEngineWrapper {
                 return m_pInstance->getNumRows();
             }
             double getValue(const int iRow, const int iColumn) {
-                return m_pInstance->getValue(iRow, iColumn);
+                return (*m_pInstance)(iRow, iColumn);
             }
             void setValue(const int iRow, const int iColumn, const double dValue) {
-                m_pInstance->setValue(iRow, iColumn, dValue);
+                (*m_pInstance)(iRow, iColumn) = dValue;
             }
             void swapRows(const int iRow1, const int iRow2) {
                 m_pInstance->swapRows(iRow1, iRow2);
@@ -84,7 +85,7 @@ namespace SimulationEngineWrapper {
                 m_pInstance->clear();
             }
             void printMatrix() {
-                m_pInstance->printMatrix();
+                std::cout << m_pInstance->getMatrixString();
             }
     };
 

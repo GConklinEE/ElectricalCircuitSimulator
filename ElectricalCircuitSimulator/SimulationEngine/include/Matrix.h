@@ -1,104 +1,129 @@
-#ifndef MATRIX_H
-#define MATRIX_H
+#pragma once
+#include <complex>
+#include <memory>
+#include <sstream>
+#include <string>
 
-#include <iostream>
-using std::swap;
-using std::unique_ptr;
-using std::make_unique;
+namespace SimulationEngine
+{
+  template<typename T>
+  concept Numeric = std::is_arithmetic_v<T> ||
+                    requires(T t)
+                    {
+                      typename T::value_type;
+                      requires std::same_as< T, std::complex<typename T::value_type> >;
+                      requires std::is_arithmetic_v<typename T::value_type>;
+                    };
 
-namespace SimulationEngine {
-
-    class PLU_Factorization;
-    class Matrix;
-
-    // All indexes in this class are zero-based
-    class Matrix final
+  template<Numeric T>
+  class Matrix final
+  {
+  public:
+    #pragma region Constructors and Destructors
+    Matrix(size_t numRows = 1, size_t numColumns = 1)
+      : _numRows(numRows),
+        _numColumns(numColumns),
+        _data(std::make_unique< std::unique_ptr< T[] >[] >(_numRows))
     {
-        public:
+      for (size_t rowIndex = 0; rowIndex < _numRows; ++rowIndex)
+        _data[rowIndex] = make_unique<T[]>(_numColumns);
+    }
 
-            Matrix() {
-                m_iNumRows = 0;
-                m_iNumColumns = 0;
-                m_pMatrix = new double* [0];
-            };
-            Matrix(const int iRows, const int iColumns);
-            Matrix(const Matrix& oMatrix);
-            Matrix(Matrix&&) = delete;
-
-            ~Matrix() {
-                delete m_pMatrix;
-            }
-
-            Matrix& operator=(const Matrix&) = delete;
-            Matrix& operator=(Matrix&&) = delete;
-
-            double& operator()(const int iRow, const int iColumn) const {
-                return m_pMatrix[iRow][iColumn];
-            }
-
-            int getNumRows() const {
-                return m_iNumRows;
-            }
-            int getNumColumns() const {
-                return m_iNumColumns;
-            }
-            double getValue(const int iRow, const int iColumn) const;
-            void setValue(const int iRow, const int iColumn, const double dValue);
-            void swapRows(const int iRow1, const int iRow2) {
-                swap(m_pMatrix[iRow1], m_pMatrix[iRow2]);
-            }
-            void swapValues(const int iRow1, const int iColumn1, const int iRow2, const int iColumn2) {
-                swap(m_pMatrix[iRow1][iColumn1], m_pMatrix[iRow2][iColumn2]);
-            }
-            void clear();
-            void printMatrix() const;
-            static void linearSystemSolver(const Matrix& oSourceVector, const PLU_Factorization& oPLU, Matrix& oVoltageVector);
-
-        private:
-
-            int m_iNumRows;
-            int m_iNumColumns;
-            double** m_pMatrix; // Outer pointer is rows, inner pointer is columns
-    };
-
-    // Represents a matrix factored into P*A*Q = L*U, where P = Row Permutation Matrix, and Q = Column Permutation Matrix
-    class PLU_Factorization final
+    Matrix(const Matrix& original)
+      : Matrix(original._numRows, original._numColumns)
     {
-        public:
+      for (auto rowIndex = 0; rowIndex < _numRows; ++rowIndex)
+      {
+        for (auto columnIndex = 0; columnIndex < _numColumns; ++columnIndex)
+          _data[rowIndex][columnIndex] = original._data[rowIndex][columnIndex];
+      }
+    }
 
-            PLU_Factorization() {
-                m_pL = make_unique<Matrix>();
-                m_pU = make_unique<Matrix>();
-                m_pP = make_unique<Matrix>();
-                m_pQ = make_unique<Matrix>();
-            }
-            PLU_Factorization(const Matrix& oConductanceMatrix) {
-                runPLU_Factorization(oConductanceMatrix);
-            }
+    Matrix(Matrix&&) = default;
+    ~Matrix() = default;
+    #pragma endregion
 
-            Matrix& getL() const {
-                return *m_pL;
-            }
-            Matrix& getU() const {
-                return *m_pU;
-            }
-            Matrix& getP() const {
-                return *m_pP;
-            }
-            Matrix& getQ() const {
-                return *m_pQ;
-            }
+    #pragma region Modifiers
+    void swapRows(size_t row1, size_t row2)
+    {
+      std::swap(_data[row1], _data[row2]);
+    }
 
-        private:
+    void swapValues(size_t row1, size_t column1, size_t row2, size_t column2)
+    {
+      std::swap(_data[row1][column1], _data[row2][column2]);
+    }
 
-            void runPLU_Factorization(const Matrix& oConductanceMatrix);
+    void clear()
+    {
+      for (size_t rowIndex = 0; rowIndex < _numRows; ++rowIndex)
+        for (size_t columnIndex = 0; columnIndex < _numColumns; ++columnIndex)
+          _data[rowIndex][columnIndex] = T{};
+    }
 
-            unique_ptr<Matrix> m_pL; // Lower triangular matrix
-            unique_ptr<Matrix> m_pU; // Upper triangular matrix
-            unique_ptr<Matrix> m_pP; // Row permutation matrix
-            unique_ptr<Matrix> m_pQ; // Column permutation matrix
-    };
+    std::string getMatrixString() const
+    {
+      std::stringstream stream;
+      for(size_t rowIndex = 0; rowIndex < _numRows; ++rowIndex)
+      {
+        stream << '[';
+        for(size_t columnIndex = 0; columnIndex < _numColumns; ++columnIndex)
+          stream << '\t' << _data[rowIndex][columnIndex];
+        stream << "\t]";
+      }
+      return stream.str();
+    }
+    #pragma endregion
 
+    #pragma region Observers
+    size_t getNumRows() const
+    {
+      return _numRows;
+    }
+
+    size_t getNumColumns() const
+    {
+      return _numColumns;
+    }
+    #pragma endregion
+
+    #pragma region Operators
+    #pragma region Modifiers
+    T& operator()(size_t row, size_t column = 0)
+    {
+      return _data[row][column];
+    }
+
+    Matrix& operator=(const Matrix& original)
+    {
+      _numRows(original._numRows);
+      _numColumns(original._numColumns);
+      _data(std::make_unique< std::unique_ptr<std::unique_ptr<T[]>[]> >(_numRows));
+
+      for (auto rowIndex = 0; rowIndex < _numRows; ++rowIndex)
+      {
+        auto row = make_unique<T[]>(_numColumns);
+        for (auto columnIndex = 0; columnIndex < _numColumns; ++columnIndex)
+          row[columnIndex] = original._data[rowIndex][columnIndex];
+        _data[rowIndex] = row;
+      }
+    }
+
+    Matrix& operator=(Matrix&&) = default;
+    #pragma endregion
+
+    #pragma region Observers
+    const T& operator()(size_t row, size_t column = 0) const
+    {
+      return _data[row][column];
+    }
+    #pragma endregion
+    #pragma endregion
+  private:
+    #pragma region Members
+    size_t _numRows;
+    size_t _numColumns;
+    std::unique_ptr< std::unique_ptr< T[] >[] > _data; // Outer pointer is rows, inner pointer is columns
+    #pragma endregion
+  };
 }
-
-#endif

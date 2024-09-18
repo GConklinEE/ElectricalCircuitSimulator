@@ -10,6 +10,7 @@
 // iNodeS is assumed to be ground (-), iNodeD is assumed to be (+).
 
 #include "GroundedVoltageSource.h"
+#include <iostream>
 
 using std::cout;
 using std::endl;
@@ -31,12 +32,12 @@ namespace SimulationEngine {
         m_dResistance = dResistance;
     }
 
-    void GroundedVoltageSource::initalize(Matrix& oConductanceMatrix, const double dTimeStep) {
+    void GroundedVoltageSource::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
         m_dCurrent = 0;
         applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
     }
 
-    void GroundedVoltageSource::applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep) {
+    void GroundedVoltageSource::applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
         double dResistance;
 
         m_dComponentResistanceStamp = 1.0 / m_dResistance;
@@ -54,7 +55,7 @@ namespace SimulationEngine {
         oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentResistanceStamp;
     };
 
-    void GroundedVoltageSource::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
+    void GroundedVoltageSource::applySourceVectorMatrixStamp(Matrix<double>& oSourceVector) {
         double dCurrent;
         double dComponentCurrentStamp;
 
@@ -67,11 +68,11 @@ namespace SimulationEngine {
         oSourceVector(m_iNodeD, 0) = dCurrent + dComponentCurrentStamp;
     };
 
-    void GroundedVoltageSource::step(Matrix& oSourceVector) {
+    void GroundedVoltageSource::step(Matrix<double>& oSourceVector) {
         applySourceVectorMatrixStamp(oSourceVector);
     }
 
-    void GroundedVoltageSource::postStep(Matrix& oVoltageMatrix) {
+    void GroundedVoltageSource::postStep(Matrix<double>& oVoltageMatrix) {
         m_dCurrent = (m_dVoltage - (oVoltageMatrix(m_iNodeD, 0) - oVoltageMatrix(m_iNodeS, 0))) / m_dResistance;
     }
 

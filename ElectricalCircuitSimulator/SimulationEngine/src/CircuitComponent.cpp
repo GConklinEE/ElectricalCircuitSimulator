@@ -1,4 +1,5 @@
 #include "CircuitComponent.h"
+#include <iostream>
 
 using std::cout;
 using std::endl;
@@ -23,23 +24,23 @@ namespace SimulationEngine {
         m_dComponentResistanceStamp = 0.0;
     }
 
-    void CircuitComponent::initalize(Matrix& oConductanceMatrix, const double dTimeStep) {
+    void CircuitComponent::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
         ;
     }
 
-    void CircuitComponent::step(Matrix& oSourceVector) {
+    void CircuitComponent::step(Matrix<double>& oSourceVector) {
         ;
     }
 
-    void CircuitComponent::postStep(Matrix& oVoltageMatrix) {
+    void CircuitComponent::postStep(Matrix<double>& oVoltageMatrix) {
         ;
     }
 
-    void CircuitComponent::applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep) {
+    void CircuitComponent::applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
         ;
     }
 
-    void CircuitComponent::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
+    void CircuitComponent::applySourceVectorMatrixStamp(Matrix<double>& oSourceVector) {
         ;
     }
 

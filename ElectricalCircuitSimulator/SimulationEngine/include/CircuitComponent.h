@@ -23,14 +23,14 @@ namespace SimulationEngine {
             double getCurrent() const {
                 return m_dCurrent;
             }
-            virtual void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
-            virtual void step(Matrix& oSourceVector);
-            virtual void postStep(Matrix& oVoltageMatrix);
+            virtual void initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep);
+            virtual void step(Matrix<double>& oSourceVector);
+            virtual void postStep(Matrix<double>& oVoltageMatrix);
 
         protected:
 
-            virtual void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
-            virtual void applySourceVectorMatrixStamp(Matrix& oSourceVector);
+            virtual void applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep);
+            virtual void applySourceVectorMatrixStamp(Matrix<double>& oSourceVector);
 
             bool m_bIsGround;
             int m_iNodeS; // Source
