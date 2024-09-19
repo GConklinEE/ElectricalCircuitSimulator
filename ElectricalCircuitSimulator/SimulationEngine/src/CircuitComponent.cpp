@@ -8,20 +8,17 @@ using std::invalid_argument;
 namespace SimulationEngine {
 
     // If the component has a ground, iNodeS is assumed to be that ground
-    CircuitComponent::CircuitComponent(const int iNodeS, const int iNodeD, bool bIsGround) {
-        if ((iNodeS < 0) || (iNodeD < 0)) {
-            cout << "Node values must be greater than or equal to 0!" << endl;
-            throw invalid_argument("Node values must be greater than or equal to 0!");
-        }
+    CircuitComponent::CircuitComponent(const size_t iNodeS, const size_t iNodeD, bool bIsGround) :
+        m_bIsGround(bIsGround),
+        m_dCurrent(0.0),
+        m_dComponentResistanceStamp(0.0)
+    {
         if (iNodeS == iNodeD) {
             cout << "Node values must not be the same!" << endl;
             throw invalid_argument("Node values must not be the same!");
         }
-        m_bIsGround = bIsGround;
         m_iNodeS = iNodeS;
         m_iNodeD = iNodeD;
-        m_dCurrent = 0.0;
-        m_dComponentResistanceStamp = 0.0;
     }
 
     void CircuitComponent::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {

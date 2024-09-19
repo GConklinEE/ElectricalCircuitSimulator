@@ -21,9 +21,9 @@ namespace SimulationEngineWrapper {
 
         public:
 
-            ManagedObject(T* pInstance) : m_pInstance(pInstance) {
-                ;
-            }
+            ManagedObject(T* pInstance) :
+                m_pInstance(pInstance)
+            { ; }
 
             virtual ~ManagedObject() {
                 if (m_pInstance != nullptr) {
@@ -36,7 +36,7 @@ namespace SimulationEngineWrapper {
                 }
             }
 
-            T& getInstance() {
+            const T& getInstance() {
                 return m_pInstance;
             }
 
@@ -64,10 +64,10 @@ namespace SimulationEngineWrapper {
             : ManagedObject(new SimulationEngine::Matrix<double>(iRows, iColumns)) { ; }
 
             int getNumRows() { 
-                return m_pInstance->getNumRows();
+                return (int)(m_pInstance->getNumRows());
             }
             int getNumColumns() {
-                return m_pInstance->getNumRows();
+                return (int)(m_pInstance->getNumRows());
             }
             double getValue(const int iRow, const int iColumn) {
                 return (*m_pInstance)(iRow, iColumn);
@@ -89,69 +89,69 @@ namespace SimulationEngineWrapper {
             }
     };
 
-    public ref class Capacitor : public ManagedObject<SimulationEngine::Capacitor> {
+    public ref class Capacitor : ManagedObject<SimulationEngine::Capacitor> {
 
         public:
 
-            Capacitor(const int iNodeS, const int iNodeD, const double m_dCapacitance)
-            : ManagedObject(new SimulationEngine::Capacitor(iNodeS, iNodeD, m_dCapacitance)) { ; }
+            Capacitor(const int iNodeS, const int iNodeD, const double m_dCapacitance) :
+                ManagedObject(new SimulationEngine::Capacitor(iNodeS, iNodeD, m_dCapacitance)) { ; }
     };
 
-    public ref class CircuitComponent : public ManagedObject<SimulationEngine::CircuitComponent> {
+    public ref class CircuitComponent : ManagedObject<SimulationEngine::CircuitComponent> {
 
         public:
 
-            CircuitComponent(const int iNodeS, const int iNodeD, bool bIsGround)
-            : ManagedObject(new SimulationEngine::CircuitComponent(iNodeS, iNodeD, bIsGround)) { ; }
+            CircuitComponent(const int iNodeS, const int iNodeD, bool bIsGround) :
+                ManagedObject(new SimulationEngine::CircuitComponent(iNodeS, iNodeD, bIsGround)) { ; }
 
             bool getIsGround() {
                 return m_pInstance->getIsGround();
             }
             int getNodeS() {
-                return m_pInstance->getNodeS();
+                return (int)(m_pInstance->getNodeS());
             }
             int getNodeD() {
-                return m_pInstance->getNodeD();
+                return (int)(m_pInstance->getNodeD());
             }
             double getCurrent() {
                 return m_pInstance->getCurrent();
             }
     };
 
-    public ref class GroundedVoltageSource : public ManagedObject<SimulationEngine::GroundedVoltageSource> {
+    public ref class GroundedVoltageSource : ManagedObject<SimulationEngine::GroundedVoltageSource> {
         
         public:
 
-            GroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance)
-            : ManagedObject(new SimulationEngine::GroundedVoltageSource(iNodeS, iNodeD, dVoltage, dResistance)) { ; }
+            GroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance) :
+                ManagedObject(new SimulationEngine::GroundedVoltageSource(iNodeS, iNodeD, dVoltage, dResistance)) { ; }
     };
 
-    public ref class Inductor : public ManagedObject<SimulationEngine::Inductor> {
+    public ref class Inductor : ManagedObject<SimulationEngine::Inductor> {
         
         public:
 
-            Inductor(const int iNodeS, const int iNodeD, const double m_dInductance)
-            : ManagedObject(new SimulationEngine::Inductor(iNodeS, iNodeD, m_dInductance)) { ; }
+            Inductor(const int iNodeS, const int iNodeD, const double m_dInductance) :
+                ManagedObject(new SimulationEngine::Inductor(iNodeS, iNodeD, m_dInductance)) { ; }
     };
         
-    public ref class LinearCircuit : public ManagedObject<SimulationEngine::LinearCircuit> {
+    public ref class LinearCircuit : ManagedObject<SimulationEngine::LinearCircuit> {
 
         public:
 
-            LinearCircuit(const int iNumComponents)
-            : ManagedObject(new SimulationEngine::LinearCircuit(iNumComponents)) { ; }
+            LinearCircuit(const int iNumComponents) :
+                ManagedObject(new SimulationEngine::LinearCircuit(iNumComponents)) { ; }
 
             int addResistor(const int iNodeS, const int iNodeD, const double dResistance) {
-                return m_pInstance->addComponent(make_unique<SimulationEngine::Resistor>(iNodeS, iNodeD, dResistance));
+                return static_cast<int>(m_pInstance->addComponent(make_unique<SimulationEngine::Resistor>(iNodeS, iNodeD, dResistance)));
             }
             int addInductor(const int iNodeS, const int iNodeD, const double dInductance) {
-                return m_pInstance->addComponent(make_unique<SimulationEngine::Inductor>(iNodeS, iNodeD, dInductance));
+                return static_cast<int>(m_pInstance->addComponent(make_unique<SimulationEngine::Inductor>(iNodeS, iNodeD, dInductance)));
             }
             int addCapacitor(const int iNodeS, const int iNodeD, const double dCapacitance) {
-                return m_pInstance->addComponent(make_unique<SimulationEngine::Capacitor>(iNodeS, iNodeD, dCapacitance));
+                return static_cast<int>(m_pInstance->addComponent(make_unique<SimulationEngine::Capacitor>(iNodeS, iNodeD, dCapacitance)));
             }
             int addGroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance) {
-                return m_pInstance->addComponent(make_unique<SimulationEngine::GroundedVoltageSource>(iNodeS, iNodeD, dVoltage, dResistance));
+                return static_cast<int>(m_pInstance->addComponent(make_unique<SimulationEngine::GroundedVoltageSource>(iNodeS, iNodeD, dVoltage, dResistance)));
             }
             void setStopTime(const double dStopTime) {
                 m_pInstance->setStopTime(dStopTime);
@@ -176,11 +176,11 @@ namespace SimulationEngineWrapper {
             }
     };
 
-    public ref class Resistor : public ManagedObject<SimulationEngine::Resistor> {
+    public ref class Resistor : ManagedObject<SimulationEngine::Resistor> {
 
         public:
 
-            Resistor(const int iNodeS, const int iNodeD, const double dResistance)
-            : ManagedObject(new SimulationEngine::Resistor(iNodeS, iNodeD, dResistance)) { ; }
+            Resistor(const int iNodeS, const int iNodeD, const double dResistance) :
+                ManagedObject(new SimulationEngine::Resistor(iNodeS, iNodeD, dResistance)) { ; }
     };
 }

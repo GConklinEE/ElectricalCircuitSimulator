@@ -15,8 +15,9 @@ using std::invalid_argument;
 
 namespace SimulationEngine {
 
-    Resistor::Resistor(const int iNodeS, const int iNodeD, const double dResistance)
-    : CircuitComponent(iNodeS, iNodeD, false) {
+    Resistor::Resistor(const size_t iNodeS, const size_t iNodeD, const double dResistance) :
+        CircuitComponent(iNodeS, iNodeD, false)
+    {
         if (dResistance <= 0) {
             cout << "Resistance value must be greater than 0!" << endl;
             throw invalid_argument("Resistance value must be greater than 0!");

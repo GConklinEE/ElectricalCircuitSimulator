@@ -9,7 +9,7 @@ namespace SimulationEngine {
 
         public:
 
-            Capacitor(const int iNodeS, const int iNodeD, const double m_dCapacitance);
+            Capacitor(const size_t iNodeS, const size_t iNodeD, const double m_dCapacitance);
 
             void initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep);
             void step(Matrix<double>& oSourceVector); // Trapezoidal integration

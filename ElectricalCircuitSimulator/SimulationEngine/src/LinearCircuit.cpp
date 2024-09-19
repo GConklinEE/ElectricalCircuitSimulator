@@ -6,12 +6,13 @@ using std::endl;
 using std::invalid_argument;
 using std::exception;
 using std::move;
+using std::vector;
 using std::unique_ptr;
 using std::make_unique;
 
 namespace SimulationEngine {
 
-    LinearCircuit::LinearCircuit(const int iNumComponents)
+    LinearCircuit::LinearCircuit(const size_t iNumComponents)
                  : m_iMaxComponentCount(iNumComponents),
                    m_pCircuitComponents(make_unique<unique_ptr<CircuitComponent>[]>(m_iMaxComponentCount)),
                    m_bHasGround(false),
@@ -30,10 +31,10 @@ namespace SimulationEngine {
         }
     }
 
-    int LinearCircuit::addComponent(unique_ptr<CircuitComponent> pCircuitComponent) {
-        int iNodeIterator;
-        int iNodeS = pCircuitComponent->getNodeS();
-        int iNodeD = pCircuitComponent->getNodeD();
+    size_t LinearCircuit::addComponent(unique_ptr<CircuitComponent> pCircuitComponent) {
+        size_t iNodeIterator;
+        size_t iNodeS = pCircuitComponent->getNodeS();
+        size_t iNodeD = pCircuitComponent->getNodeD();
         bool bFoundNodeS = false;
         bool bFoundNodeD = false;
 
@@ -101,11 +102,7 @@ namespace SimulationEngine {
         return m_dTime;
     }
 
-    double LinearCircuit::getVoltage(const int iNode) const {
-        if (iNode < 0) {
-            cout << "Node values must be greater than or equal to 0!" << endl;
-            throw invalid_argument("Node values must be greater than or equal to 0!");
-        }
+    double LinearCircuit::getVoltage(const size_t iNode) const {
         if (iNode > m_iMaxNode) {
             cout << "Requested node does not exist!" << endl;
             throw invalid_argument("Requested node does not exist!");
@@ -118,7 +115,7 @@ namespace SimulationEngine {
         return m_pVoltageVector(iNode, 0);
     }
 
-    double LinearCircuit::getCurrent(const int iComponentIndex) const {
+    double LinearCircuit::getCurrent(const size_t iComponentIndex) const {
         if (iComponentIndex >= m_iComponentCount) {
             cout << "Requested component does not exist!" << endl;
             throw invalid_argument("Requested component does not exist!");
@@ -132,8 +129,8 @@ namespace SimulationEngine {
     }
 
     void LinearCircuit::initalize() {
-        int iIterator;
-        int iNode;
+        size_t iIterator;
+        size_t iNode;
         bool bFoundIndex;
 
         // Check for valid time step and stop time. Check that there are actually nodes in the circuit to simulate. Check that a ground exists.
@@ -199,7 +196,7 @@ namespace SimulationEngine {
     }
 
     bool LinearCircuit::step() {
-        int iIterator;
+        size_t iIterator;
         double dNormalizationFactor;
 
         if (m_bInitSim == false) {

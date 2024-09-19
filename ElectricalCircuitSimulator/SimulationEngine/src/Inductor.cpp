@@ -19,14 +19,15 @@ using std::invalid_argument;
 
 namespace SimulationEngine {
 
-    Inductor::Inductor(const int iNodeS, const int iNodeD, const double dInductance)
-    : CircuitComponent(iNodeS, iNodeD, false) {
+    Inductor::Inductor(const size_t iNodeS, const size_t iNodeD, const double dInductance) :
+        CircuitComponent(iNodeS, iNodeD, false),
+        m_dVoltageDelta(0)
+    {
         if (dInductance <= 0) {
             cout << "Inductance value must be greater than 0!" << endl;
             throw invalid_argument("Inductance value must be greater than 0!");
         }
         m_dInductance = dInductance;
-        m_dVoltageDelta = 0;
     }
 
     void Inductor::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {

@@ -478,7 +478,7 @@ namespace ElectricalCircuitSimulator
 
         #region Data Members
 
-        public bool m_bTestMode; // Unit testing mode
+        private bool m_bTestMode; // Unit testing mode
         private double m_dStepSize;
         private double m_dStopTime;
         private LineSeries m_oLineSeriesV;

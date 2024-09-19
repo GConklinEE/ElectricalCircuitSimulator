@@ -18,7 +18,7 @@ using std::make_unique;
 void SimulationIntegrationTestSeriesRR()
 {
     bool bDone;
-    int iSteps = 0;
+    size_t iSteps = 0;
     LinearCircuit* pLinearCircuit = new LinearCircuit(3);
 
     pLinearCircuit->addComponent(make_unique<GroundedVoltageSource>(2, 1, 30, 10)); // Node 2 is ground
@@ -50,7 +50,7 @@ void SimulationIntegrationTestSeriesRR()
 void SimulationIntegrationTestSeriesRC()
 {
     bool bDone;
-    int iSteps = 0;
+    size_t iSteps = 0;
     LinearCircuit* pLinearCircuit = new LinearCircuit(3);
 
     pLinearCircuit->addComponent(make_unique<GroundedVoltageSource>(2, 1, 30, 10)); // Node 2 is ground
@@ -82,7 +82,7 @@ void SimulationIntegrationTestSeriesRC()
 void SimulationIntegrationTestSeriesRL()
 {
     bool bDone;
-    int iSteps = 0;
+    size_t iSteps = 0;
     LinearCircuit* pLinearCircuit = new LinearCircuit(3);
 
     pLinearCircuit->addComponent(make_unique<GroundedVoltageSource>(2, 1, 30, 10)); // Node 2 is ground

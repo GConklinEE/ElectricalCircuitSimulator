@@ -9,15 +9,15 @@ namespace SimulationEngine {
 
         public:
 
-            CircuitComponent(const int iNodeS, const int iNodeD, bool bIsGround);
+            CircuitComponent(const size_t iNodeS, const size_t iNodeD, bool bIsGround);
 
             bool getIsGround() const {
                 return m_bIsGround;
             }
-            int getNodeS() const {
+            size_t getNodeS() const {
                 return m_iNodeS;
             }
-            int getNodeD() const {
+            size_t getNodeD() const {
                 return m_iNodeD;
             }
             double getCurrent() const {
@@ -33,8 +33,8 @@ namespace SimulationEngine {
             virtual void applySourceVectorMatrixStamp(Matrix<double>& oSourceVector);
 
             bool m_bIsGround;
-            int m_iNodeS; // Source
-            int m_iNodeD; // Destination
+            size_t m_iNodeS; // Source
+            size_t m_iNodeD; // Destination
             double m_dComponentResistanceStamp;
             double m_dCurrent; // Current is positive if flowing from source to destination, negative if the opposite direction
     };

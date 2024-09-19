@@ -225,8 +225,7 @@ namespace UnitTests
             CircuitComponent oCircuitComponent;
 
             AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(5, 5, false), "Expected 'Node values must not be the same!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(0, -6, false), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(-5, 6, false), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(0, 0, false), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
 
             oCircuitComponent = new CircuitComponent(0, 5, false);
             Assert.IsTrue(oCircuitComponent.getIsGround() == false, "Incorrect value! Expected false");
