@@ -9,7 +9,7 @@ namespace SimulationEngine {
 
         public:
 
-            Resistor(const int iNodeS, const int iNodeD, const double dResistance);
+            Resistor(const size_t iNodeS, const size_t iNodeD, const double dResistance);
 
             void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
             void postStep(Matrix& oVoltageMatrix);

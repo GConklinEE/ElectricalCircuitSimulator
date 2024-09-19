@@ -1,6 +1,6 @@
 # Electrical Circuit Simulator
 ## Running the Software
-- To run the software, download the latest release off Github.
+- To run the software, download the latest release off Github. If you don't already have it, you will be prompted to install the .NET 8.0 desktop runtime first.
 ## About the Software
 - Electrical Circuit Simulator is an app that can simulate electrical circuits via converting them into resistance/current matrices, and then solving for the node voltages via PLU matrix factorization.
 - Note that Electrical Circuit Simulator is not a marketing term or a brand name, but simply a description of what the app does.

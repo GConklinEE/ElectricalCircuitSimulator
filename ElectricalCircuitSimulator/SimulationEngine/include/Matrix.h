@@ -2,6 +2,8 @@
 #define MATRIX_H
 
 #include <iostream>
+#include <string>
+#include <memory>
 
 namespace SimulationEngine {
 
@@ -9,65 +11,77 @@ namespace SimulationEngine {
     class Matrix;
 
     // All indexes in this class are zero-based
-    class Matrix
+    class Matrix final
     {
         public:
 
-            Matrix() {
-                m_iNumRows = 0;
-                m_iNumColumns = 0;
-                m_oMatrix = new double* [0];
-            };
-            Matrix(const int iRows, const int iColumns);
+            Matrix();
+            Matrix(const size_t iRows, const size_t iColumns);
+            Matrix(const Matrix& oMatrix);
+            Matrix(Matrix&&) = delete;
 
             ~Matrix() {
-                delete m_oMatrix;
+                delete m_pMatrix;
             }
 
-            int getNumRows() const { 
+            Matrix& operator=(const Matrix&) = delete;
+            Matrix& operator=(Matrix&&) = delete;
+            const double& operator()(const size_t iRow, const size_t iColumn) const {
+                return m_pMatrix[iRow][iColumn];
+            }
+            double& operator()(const size_t iRow, const size_t iColumn) {
+                return m_pMatrix[iRow][iColumn];
+            }
+
+            size_t getNumRows() const {
                 return m_iNumRows;
             }
-            int getNumColumns() const {
+            size_t getNumColumns() const {
                 return m_iNumColumns;
             }
-            double getValue(const int iRow, const int iColumn) const;
-            void setValue(const int iRow, const int iColumn, const double dValue);
+            double getValue(const size_t iRow, const size_t iColumn) const;
+            void setValue(const size_t iRow, const size_t iColumn, const double dValue);
+            void swapRows(const size_t iRow1, const size_t iRow2);
+            void swapValues(const size_t iRow1, const size_t iColumn1, const size_t iRow2, const size_t iColumn2);
             void clear();
-            Matrix* clone() const;
-            void printMatrix() const;
-            PLU_Factorization* runPLU_Factorization() const;
-            static Matrix* linearSystemSolver(const Matrix& oSourceVector, const PLU_Factorization& oPLU_Factorization);
+            const std::string printMatrix() const;
 
         private:
 
-            int m_iNumRows;
-            int m_iNumColumns;
-            double** m_oMatrix; // Outer pointer is rows, inner pointer is columns
+            size_t m_iNumRows;
+            size_t m_iNumColumns;
+            double** m_pMatrix; // Outer pointer is rows, inner pointer is columns
     };
 
     // Represents a matrix factored into P*A*Q = L*U, where P = Row Permutation Matrix, and Q = Column Permutation Matrix
-    class PLU_Factorization
+    class PLU_Factorization final
     {
         public:
 
-            PLU_Factorization() {
-                m_pL = new Matrix();
-                m_pU = new Matrix();
-                m_pP = new Matrix();
-                m_pQ = new Matrix();
-            };
+            PLU_Factorization();
+            PLU_Factorization(const Matrix& oMatrix);
 
-            ~PLU_Factorization() {
-                delete m_pL;
-                delete m_pU;
-                delete m_pP;
-                delete m_pQ;
-            };
+            const Matrix& getL() const {
+                return *m_pL;
+            }
+            const Matrix& getU() const {
+                return *m_pU;
+            }
+            const Matrix& getP() const {
+                return *m_pP;
+            }
+            const Matrix& getQ() const {
+                return *m_pQ;
+            }
 
-            Matrix* m_pL; // Lower triangular matrix
-            Matrix* m_pU; // Upper triangular matrix
-            Matrix* m_pP; // Row permutation matrix
-            Matrix* m_pQ; // Column permutation matrix
+        private:
+
+            void runPLU_Factorization(const Matrix& oMatrix);
+
+            std::unique_ptr<Matrix> m_pL; // Lower triangular matrix
+            std::unique_ptr<Matrix> m_pU; // Upper triangular matrix
+            std::unique_ptr<Matrix> m_pP; // Row permutation matrix
+            std::unique_ptr<Matrix> m_pQ; // Column permutation matrix
     };
 
 }

@@ -9,7 +9,7 @@ namespace SimulationEngine {
 
         public:
 
-            GroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance); // iNodeS is assumed to be ground
+            GroundedVoltageSource(const size_t iNodeS, const size_t iNodeD, const double dVoltage, const double dResistance); // iNodeS is assumed to be ground
 
             void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
             void step(Matrix& oSourceVector);
