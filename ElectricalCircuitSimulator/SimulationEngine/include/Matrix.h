@@ -25,6 +25,9 @@ namespace SimulationEngine
         _numColumns(numColumns),
         _data(std::make_unique< std::unique_ptr< T[] >[] >(_numRows))
     {
+      if (numRows == 0 || numColumns == 0)
+        throw std::invalid_argument("Matrix dimensions must be positive and non-zero!");
+
       for (size_t rowIndex = 0; rowIndex < _numRows; ++rowIndex)
         _data[rowIndex] = make_unique<T[]>(_numColumns);
     }
@@ -46,11 +49,15 @@ namespace SimulationEngine
     #pragma region Modifiers
     void swapRows(size_t row1, size_t row2)
     {
+      checkBounds(row1, 0);
+      checkBounds(row2, 0);
       std::swap(_data[row1], _data[row2]);
     }
 
     void swapValues(size_t row1, size_t column1, size_t row2, size_t column2)
     {
+      checkBounds(row1, column1);
+      checkBounds(row2, column2);
       std::swap(_data[row1][column1], _data[row2][column2]);
     }
 
@@ -91,6 +98,7 @@ namespace SimulationEngine
     #pragma region Modifiers
     T& operator()(size_t row, size_t column = 0)
     {
+      checkBounds(row, column);
       return _data[row][column];
     }
 
@@ -115,6 +123,7 @@ namespace SimulationEngine
     #pragma region Observers
     const T& operator()(size_t row, size_t column = 0) const
     {
+      checkBounds(row, column);
       return _data[row][column];
     }
     #pragma endregion
@@ -124,6 +133,14 @@ namespace SimulationEngine
     size_t _numRows;
     size_t _numColumns;
     std::unique_ptr< std::unique_ptr< T[] >[] > _data; // Outer pointer is rows, inner pointer is columns
+    #pragma endregion
+
+    #pragma region Observers
+    inline void checkBounds(size_t row, size_t column) const
+    {
+      if (row >= _numRows || column >= _numColumns)
+        throw std::invalid_argument("Location beyond dimensions of matrix!");
+    }
     #pragma endregion
   };
 }

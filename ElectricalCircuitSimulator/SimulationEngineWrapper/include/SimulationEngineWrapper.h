@@ -61,7 +61,11 @@ namespace SimulationEngineWrapper {
             Matrix()
             : ManagedObject(new SimulationEngine::Matrix<double>()) { ; }
             Matrix(const int iRows, const int iColumns)
-            : ManagedObject(new SimulationEngine::Matrix<double>(iRows, iColumns)) { ; }
+            : ManagedObject(new SimulationEngine::Matrix<double>(iRows, iColumns))
+            {
+              if (iRows < 0 || iColumns < 0)
+                throw std::invalid_argument("Matrix dimensions must be positive and non-zero!");
+            }
 
             int getNumRows() { 
                 return (int)(m_pInstance->getNumRows());
