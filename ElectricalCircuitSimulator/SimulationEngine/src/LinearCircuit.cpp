@@ -12,18 +12,18 @@ using std::make_unique;
 
 namespace SimulationEngine {
 
-    LinearCircuit::LinearCircuit(const size_t iNumComponents)
-                 : m_iMaxComponentCount(iNumComponents),
-                   m_pCircuitComponents(make_unique<unique_ptr<CircuitComponent>[]>(m_iMaxComponentCount)),
-                   m_bHasGround(false),
-                   m_iComponentCount(0),
-                   m_iMaxNode(0),
-                   m_iGroundNode(0),
-                   m_dStopTime(0),
-                   m_dTimeStep(0),
-                   m_dTime(0),
-                   m_bInitSim(false),
-                   m_bRunSim(false)
+    LinearCircuit::LinearCircuit(const size_t iNumComponents) :
+        m_iMaxComponentCount(iNumComponents),
+        m_iComponentCount(0),
+        m_iMaxNode(0),
+        m_iGroundNode(0),
+        m_dStopTime(0),
+        m_dTimeStep(0),
+        m_dTime(0),
+        m_bHasGround(false),
+        m_bInitSim(false),
+        m_bRunSim(false),
+        m_pCircuitComponents(make_unique<unique_ptr<CircuitComponent>[]>(m_iMaxComponentCount))
     {
         if (iNumComponents <= 0) {
             cout << "Circuit must have a positive and non-zero number of components!" << endl;
@@ -56,7 +56,7 @@ namespace SimulationEngine {
             m_pCircuitComponents[m_iComponentCount] = move(pCircuitComponent);
             m_iComponentCount++;
         }
-        for (iNodeIterator = 0; iNodeIterator < (int)m_oNodeList.size(); iNodeIterator++) {
+        for (iNodeIterator = 0; iNodeIterator < static_cast<int>(m_oNodeList.size()); iNodeIterator++) {
             if (!bFoundNodeS && (iNodeS == m_oNodeList[iNodeIterator])) {
                 bFoundNodeS = true;
             }
@@ -112,7 +112,7 @@ namespace SimulationEngine {
             throw exception("Cannot read voltages from a circuit that has not been simulated!");
         }
 
-        return m_pVoltageVector(iNode, 0);
+        return m_oVoltageVector(iNode, 0);
     }
 
     double LinearCircuit::getCurrent(const size_t iComponentIndex) const {
@@ -162,33 +162,33 @@ namespace SimulationEngine {
         }
 
         // Declare blank matrices.
-        m_pConductanceMatrix = Matrix<double>(m_iMaxNode + 1, m_iMaxNode + 1);
-        m_pSourceVector = Matrix<double>(m_iMaxNode + 1, 1);
-        m_pVoltageVector = Matrix<double>(m_iMaxNode + 1, 1);
+        m_oConductanceMatrix = Matrix<double>(m_iMaxNode + 1, m_iMaxNode + 1);
+        m_oSourceVector = Matrix<double>(m_iMaxNode + 1, 1);
+        m_oVoltageVector = Matrix<double>(m_iMaxNode + 1, 1);
 
         // Build the conductance and initial source vector matrices
         for (iIterator = 0; iIterator < m_iComponentCount; iIterator++) {
-            m_pCircuitComponents[iIterator]->initalize(m_pConductanceMatrix, m_dTimeStep);
+            m_pCircuitComponents[iIterator]->initalize(m_oConductanceMatrix, m_dTimeStep);
         }
 
         // Factor the conductance matrix
-        m_pPLU_Factorization = PLU_Factorization<double>(m_pConductanceMatrix);
+        m_oPLU = PLU_Factorization<double>(m_oConductanceMatrix);
 
 #ifdef MATRIX_PRINT
         // Print out the matrices
         cout << "Conductance Matrix:" << endl;
-        cout << m_pConductanceMatrix.getMatrixString();
+        cout << m_oConductanceMatrix.getMatrixString();
         cout << "Source Vector:" << endl;
-        cout << m_pSourceVector.getMatrixString();
+        cout << m_oSourceVector.getMatrixString();
         cout << "PLU Factorization Matrixes:" << endl;
         cout << "L:" << endl;
-        cout << m_pPLU_Factorization.getL().getMatrixString();
+        cout << m_oPLU.getL().getMatrixString();
         cout << "P:" << endl;
-        cout << m_pPLU_Factorization.getP().getMatrixString();
+        cout << m_oPLU.getP().getMatrixString();
         cout << "Q:" << endl;
-        cout << m_pPLU_Factorization.getQ().getMatrixString();
+        cout << m_oPLU.getQ().getMatrixString();
         cout << "U:" << endl;
-        cout << m_pPLU_Factorization.getU().getMatrixString();
+        cout << m_oPLU.getU().getMatrixString();
 #endif
 
         m_dTime = 0; // Set simulation time to zero
@@ -208,27 +208,27 @@ namespace SimulationEngine {
         cout << "**** Time: " << (m_dTime + m_dTimeStep) << " s ****\n" << endl;
 #endif
 
-        m_pSourceVector.clear(); // Is rebuilt every step
+        m_oSourceVector.clear(); // Is rebuilt every step
 
         // Run all component step functions
         for (iIterator = 0; iIterator < m_iComponentCount; iIterator++) {
-            m_pCircuitComponents[iIterator]->step(m_pSourceVector);
+            m_pCircuitComponents[iIterator]->step(m_oSourceVector);
         }
 
         // Find the new voltage matrix
-        m_pVoltageVector = m_pPLU_Factorization.solve(m_pSourceVector);
+        m_oVoltageVector = m_oPLU.solve(m_oSourceVector);
 
         // Check to see if the voltage matrix requires normalization
-        dNormalizationFactor = -m_pVoltageVector(m_iGroundNode);
+        dNormalizationFactor = -m_oVoltageVector(m_iGroundNode);
         if (dNormalizationFactor != 0) {
             for (iIterator = 0; iIterator <= m_iMaxNode; iIterator++) {
-                m_pVoltageVector(iIterator) = m_pVoltageVector(iIterator) + dNormalizationFactor;
+                m_oVoltageVector(iIterator) = m_oVoltageVector(iIterator) + dNormalizationFactor;
             }
         }
 
         // Run all component post-step functions 
         for (iIterator = 0; iIterator < m_iComponentCount; iIterator++) {
-            m_pCircuitComponents[iIterator]->postStep(m_pVoltageVector);
+            m_pCircuitComponents[iIterator]->postStep(m_oVoltageVector);
         }
 
         m_dTime += m_dTimeStep; // Update simulation runtime
@@ -236,9 +236,9 @@ namespace SimulationEngine {
 
 #ifdef MATRIX_PRINT
         cout << "Source Vector:" << endl;
-        cout << m_pSourceVector.getMatrixString();
+        cout << m_oSourceVector.getMatrixString();
         cout << "Voltage Matrix:" << endl;
-        cout << m_pVoltageVector.getMatrixString();
+        cout << m_oVoltageVector.getMatrixString();
 #endif
 
         if (m_dTime >= m_dStopTime)

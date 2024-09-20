@@ -1,5 +1,4 @@
-#ifndef CAPACITOR_H
-#define CAPACITOR_H
+#pragma once
 
 #include "CircuitComponent.h"
 
@@ -24,5 +23,3 @@ namespace SimulationEngine {
     };
 
 }
-
-#endif

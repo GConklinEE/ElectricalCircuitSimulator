@@ -19,7 +19,10 @@ using std::invalid_argument;
 namespace SimulationEngine {
 
     GroundedVoltageSource::GroundedVoltageSource(const size_t iNodeS, const size_t iNodeD, const double dVoltage, const double dResistance) :
-        CircuitComponent(iNodeS, iNodeD, true) {
+        CircuitComponent(iNodeS, iNodeD, true),
+        m_dVoltage(dVoltage),
+        m_dResistance(dResistance)
+    {
         if (dResistance <= 0) {
             cout << "Resistance value must be greater than 0!" << endl;
             throw invalid_argument("Resistance value must be greater than 0!");
@@ -28,8 +31,6 @@ namespace SimulationEngine {
             cout << "Voltage value must be greater than 0!" << endl;
             throw invalid_argument("Voltage value must be greater than 0!");
         }
-        m_dVoltage = dVoltage;
-        m_dResistance = dResistance;
     }
 
     void GroundedVoltageSource::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {

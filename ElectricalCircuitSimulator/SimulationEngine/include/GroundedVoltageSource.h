@@ -1,5 +1,4 @@
-#ifndef GROUNDED_VOLTAGE_SOURCE_H
-#define GROUNDED_VOLTAGE_SOURCE_H
+#pragma once
 
 #include "CircuitComponent.h"
 
@@ -24,5 +23,3 @@ namespace SimulationEngine {
     };
 
 }
-
-#endif

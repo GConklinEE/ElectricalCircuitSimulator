@@ -1,5 +1,4 @@
-#ifndef LINEARCIRCUIT_H
-#define LINEARCIRCUIT_H
+#pragma once
 
 #include "CircuitComponent.h"
 #include "PLU_Factorization.h"
@@ -22,24 +21,24 @@ namespace SimulationEngine {
             void initalize();
             bool step();
 
-  private:
-    size_t m_iMaxComponentCount;
-    std::unique_ptr<std::unique_ptr<CircuitComponent>[]> m_pCircuitComponents;
-    bool m_bHasGround;
-    int m_iComponentCount;
-    size_t m_iMaxNode;
-    size_t m_iGroundNode;
-    double m_dStopTime;
-    double m_dTimeStep;
-    double m_dTime;
-    bool m_bInitSim;
-    bool m_bRunSim;
-    Matrix<double> m_pConductanceMatrix;
-    Matrix<double> m_pSourceVector;
-    Matrix<double> m_pVoltageVector;
-    PLU_Factorization<double> m_pPLU_Factorization;
-    std::vector<size_t> m_oNodeList;
-  };
-}
+        private:
 
-#endif
+            size_t m_iMaxComponentCount;
+            size_t m_iComponentCount;
+            size_t m_iMaxNode;
+            size_t m_iGroundNode;
+            double m_dStopTime;
+            double m_dTimeStep;
+            double m_dTime;
+            bool m_bHasGround;
+            bool m_bInitSim;
+            bool m_bRunSim;
+            std::unique_ptr<std::unique_ptr<CircuitComponent>[]> m_pCircuitComponents;
+            Matrix<double> m_oConductanceMatrix;
+            Matrix<double> m_oSourceVector;
+            Matrix<double> m_oVoltageVector;
+            PLU_Factorization<double> m_oPLU;
+            std::vector<size_t> m_oNodeList;
+    };
+
+}

@@ -21,13 +21,13 @@ namespace SimulationEngine {
 
     Capacitor::Capacitor(const size_t iNodeS, const size_t iNodeD, const double dCapacitance) :
         CircuitComponent(iNodeS, iNodeD, false),
+        m_dCapacitance(dCapacitance),
         m_dVoltageDelta(0)
     {
         if (dCapacitance <= 0) {
             cout << "Capacitance value must be greater than 0!" << endl;
             throw invalid_argument("Capacitance value must be greater than 0!");
         }
-        m_dCapacitance = dCapacitance;
     }
 
     void Capacitor::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {

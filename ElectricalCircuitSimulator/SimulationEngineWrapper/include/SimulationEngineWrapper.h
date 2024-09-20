@@ -46,32 +46,28 @@ namespace SimulationEngineWrapper {
 
     };
         
-    public ref class PLU_Factorization : public ManagedObject<SimulationEngine::PLU_Factorization<double>> {
+    public ref class PLU_Factorization : ManagedObject<SimulationEngine::PLU_Factorization<double>> {
 
         public:
 
-            PLU_Factorization() 
-            : ManagedObject(new SimulationEngine::PLU_Factorization<double>()) { ; }
+            PLU_Factorization() :
+                ManagedObject(new SimulationEngine::PLU_Factorization<double>()) { ; }
     };
 
-    public ref class Matrix : public ManagedObject<SimulationEngine::Matrix<double>> {
+    public ref class Matrix : ManagedObject<SimulationEngine::Matrix<double>> {
 
         public:
 
-            Matrix()
-            : ManagedObject(new SimulationEngine::Matrix<double>()) { ; }
-            Matrix(const int iRows, const int iColumns)
-            : ManagedObject(new SimulationEngine::Matrix<double>(iRows, iColumns))
-            {
-              if (iRows < 0 || iColumns < 0)
-                throw std::invalid_argument("Matrix dimensions must be positive and non-zero!");
-            }
+            Matrix() :
+                ManagedObject(new SimulationEngine::Matrix<double>()) { ; }
+            Matrix(const int iRows, const int iColumns) :
+                ManagedObject(new SimulationEngine::Matrix<double>(iRows, iColumns)) { ; }
 
             int getNumRows() { 
-                return (int)(m_pInstance->getNumRows());
+                return static_cast<int>(m_pInstance->getNumRows());
             }
             int getNumColumns() {
-                return (int)(m_pInstance->getNumRows());
+                return static_cast<int>(m_pInstance->getNumRows());
             }
             double getValue(const int iRow, const int iColumn) {
                 return (*m_pInstance)(iRow, iColumn);
@@ -112,10 +108,10 @@ namespace SimulationEngineWrapper {
                 return m_pInstance->getIsGround();
             }
             int getNodeS() {
-                return (int)(m_pInstance->getNodeS());
+                return static_cast<int>(m_pInstance->getNodeS());
             }
             int getNodeD() {
-                return (int)(m_pInstance->getNodeD());
+                return static_cast<int>(m_pInstance->getNodeD());
             }
             double getCurrent() {
                 return m_pInstance->getCurrent();

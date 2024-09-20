@@ -21,13 +21,13 @@ namespace SimulationEngine {
 
     Inductor::Inductor(const size_t iNodeS, const size_t iNodeD, const double dInductance) :
         CircuitComponent(iNodeS, iNodeD, false),
+        m_dInductance(dInductance),
         m_dVoltageDelta(0)
     {
         if (dInductance <= 0) {
             cout << "Inductance value must be greater than 0!" << endl;
             throw invalid_argument("Inductance value must be greater than 0!");
         }
-        m_dInductance = dInductance;
     }
 
     void Inductor::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {

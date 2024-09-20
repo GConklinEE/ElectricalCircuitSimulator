@@ -1,151 +1,183 @@
 #pragma once
+
 #include "Matrix.h"
+#include <iostream>
 
-namespace SimulationEngine
-{
-  // Represents a matrix factored into P*A*Q = L*U, where P = Row Permutation Matrix,
-  // and Q = Column Permutation Matrix
-  template<Numeric T>
-  class PLU_Factorization final
-  {
-  public:
-    #pragma region Constructors and Destructors
-    PLU_Factorization(const Matrix<T>& A = Matrix<T>{})
-      : _A(A),
-        _L(_A.getNumRows(), _A.getNumRows()),
-        _U(_A),
-        _P(_A.getNumRows(), 1),
-        _Q(_A.getNumRows(), 1)
-    {
-      runPLU_Factorization();
-    }
-    #pragma endregion
+namespace SimulationEngine {
 
-    #pragma region Observers
-    const Matrix<T>& getL() const
-    {
-      return _L;
-    }
+    // Represents a matrix factored into P*A*Q = L*U, where P = Row Permutation Matrix,
+    // and Q = Column Permutation Matrix
+    template<Numeric T>
+    class PLU_Factorization final {
 
-    const Matrix<T>& getU() const
-    {
-      return _U;
-    }
+        public:
 
-    const Matrix<size_t>& getP() const
-    {
-      return _P;
-    }
+            #pragma region Constructors and Destructors
 
-    const Matrix<size_t>& getQ() const
-    {
-      return _Q;
-    }
-
-    Matrix<T> solve(const Matrix<T>& b)
-    {
-      static const T EPSILON = 1e-9;
-
-      auto numRows = b.getNumRows();
-      Matrix<T> X(numRows);
-      Matrix<T> Y(numRows);
-      Matrix<T> B_Permuted(numRows);
-      Matrix<T> solution(numRows);
-
-      // Apply row permutations to B to get B_Permuted
-      for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
-        B_Permuted(rowIndex) = b(_P(rowIndex));
-
-      // Forward substitution to solve LY = B_Permuted
-      for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
-      {
-        Y(rowIndex) = B_Permuted(rowIndex);
-        for (size_t rowIndex2 = 0; rowIndex2 < rowIndex; ++rowIndex2)
-          Y(rowIndex) -= _L(rowIndex, rowIndex2)* Y(rowIndex2);
-      }
-
-      // Backward substitution to solve UX = Y
-      for (size_t rowIndex = numRows - 1; rowIndex-->0;)
-      {
-        X(rowIndex) = Y(rowIndex);
-        for (size_t rowIndex2 = rowIndex + 1; rowIndex2 < numRows; ++rowIndex2)
-          X(rowIndex) -= _U(rowIndex, rowIndex2) * X(rowIndex2);
-        
-        auto uDiagonal = _U(rowIndex, rowIndex);
-        // If a diagonal on the U matrix is 0, it's due to the ground node being included in the matrix,
-        // and is effectively infinity, resulting in oX = 0 for this row.
-        X(rowIndex) = uDiagonal > EPSILON || uDiagonal < -EPSILON ? X(rowIndex) / uDiagonal
-                                                                  : T{};
-      }
-
-      // Apply column permutations to X using Q to get X_Final
-      for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
-        solution(_Q(rowIndex)) = X(rowIndex);
-
-      return solution;
-    }
-    #pragma endregion
-
-  private:
-    Matrix<T> _A; //Matrix to decompose
-    Matrix<T> _L; //Lower triangular matrix
-    Matrix<T> _U; //Upper triangular matrix
-    Matrix<size_t> _P; //Row permuation matrix
-    Matrix<size_t> _Q; //Column permutation matrix
-
-    void runPLU_Factorization()
-    {
-      auto numRows = _A.getNumRows();
-      //Initialize L to an identity matrix
-      for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
-        _L(rowIndex, rowIndex) = 1;
-
-      for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
-        _P(rowIndex, 0) = _Q(rowIndex, 0) = rowIndex;
-
-      for (size_t rowIndex3 = 0; rowIndex3 < numRows; ++rowIndex3)
-      {
-        // Find the pivot (maximum element) in the submatrix U[rowIndex3:numRows][rowIndex3:numRows]
-        T maxValue = T{};
-        auto maxRow = rowIndex3;
-        auto maxColumn = rowIndex3;
-        for (size_t rowIndex1 = rowIndex3; rowIndex1 < numRows; ++rowIndex1)
-        {
-          for (size_t rowIndex2 = rowIndex3; rowIndex2 < numRows; ++rowIndex2)
-          {
-            auto absoluteValue = _U(rowIndex1, rowIndex2) < 0 ? -_U(rowIndex1, rowIndex2) : _U(rowIndex1, rowIndex2);
-            if (absoluteValue > maxValue)
+            PLU_Factorization(const Matrix<T>& oA = Matrix<T>{}) :
+                m_oA(oA),
+                m_oL(m_oA.getNumRows(), m_oA.getNumRows()),
+                m_oU(m_oA),
+                m_oP(m_oA.getNumRows(), 1),
+                m_oQ(m_oA.getNumRows(), 1)
             {
-              maxValue = absoluteValue;
-              maxRow = rowIndex1;
-              maxColumn = rowIndex2;
+              runPLU_Factorization();
             }
-          }
-        }
 
-        // Swap rows in U to move the pivot to position (iI3, iI3)
-        _U.swapRows(rowIndex3, maxRow);
-        _P.swapRows(rowIndex3, maxRow);
+            #pragma endregion
 
-        // Swap columns in U to move the pivot to position (iI3, iI3)
-        for (size_t rowIndex1 = 0; rowIndex1 < numRows; ++rowIndex1)
-          _U.swapValues(rowIndex1, rowIndex3, rowIndex1, maxColumn);
+            #pragma region Observers
 
-        _Q.swapRows(rowIndex3, maxColumn);
+            const Matrix<T>& getL() const {
+                return m_oL;
+            }
 
-        // Update L for the row swaps
-        for (size_t rowIndex1 = 0; rowIndex1 < rowIndex3; ++rowIndex1)
-          _L.swapValues(rowIndex3, rowIndex1, maxRow, rowIndex1);
+            const Matrix<T>& getU() const {
+                return m_oU;
+            }
 
-        // Compute multipliers and update U
-        for (auto rowIndex1 = rowIndex3 + 1; rowIndex1 < numRows; ++rowIndex1)
-        {
-          _L(rowIndex1, rowIndex3) = _U(rowIndex1, rowIndex3) / _U(rowIndex3, rowIndex3);
-          for (auto rowIndex2 = rowIndex3 + 1; rowIndex2 < numRows; ++rowIndex2)
-            _U(rowIndex1, rowIndex2) = _U(rowIndex1, rowIndex2) - _L(rowIndex1, rowIndex3) * _U(rowIndex3, rowIndex2);
-          _U(rowIndex1, rowIndex3) = T{};
-        }
-      }
-    }
-  };
+            const Matrix<size_t>& getP() const {
+                return m_oP;
+            }
+
+            const Matrix<size_t>& getQ() const {
+                return m_oQ;
+            }
+
+            Matrix<T> solve(const Matrix<T>& oB) const {
+                static const T uEPSILON = 1e-9;
+
+                size_t iNumRows = oB.getNumRows();
+                size_t iRowIndex1;
+                size_t iRowIndex2;
+                T uDiagonal;
+                Matrix<T> oX(iNumRows);
+                Matrix<T> oY(iNumRows);
+                Matrix<T> oB_Permuted(iNumRows);
+                Matrix<T> oSolution(iNumRows);
+
+                // Apply row permutations to B to get B_Permuted
+                for (iRowIndex1 = 0; iRowIndex1 < iNumRows; ++iRowIndex1) {
+                    oB_Permuted(iRowIndex1) = oB(m_oP(iRowIndex1));
+                }
+
+                // Forward substitution to solve LY = B_Permuted
+                for (iRowIndex1 = 0; iRowIndex1 < iNumRows; ++iRowIndex1) {
+                    oY(iRowIndex1) = oB_Permuted(iRowIndex1);
+                    for (iRowIndex2 = 0; iRowIndex2 < iRowIndex1; ++iRowIndex2) {
+                        oY(iRowIndex1) -= m_oL(iRowIndex1, iRowIndex2)* oY(iRowIndex2);
+                    }
+                }
+
+                // Backward substitution to solve UX = Y
+                for (iRowIndex1 = iNumRows - 1; iRowIndex1-->0;) {
+                    oX(iRowIndex1) = oY(iRowIndex1);
+                    for (iRowIndex2 = iRowIndex1 + 1; iRowIndex2 < iNumRows; ++iRowIndex2) {
+                        oX(iRowIndex1) -= m_oU(iRowIndex1, iRowIndex2) * oX(iRowIndex2);
+                    }
+
+                    uDiagonal = m_oU(iRowIndex1, iRowIndex1);
+                    // If a diagonal on the U matrix is 0, it's due to the ground node being included in the matrix,
+                    // and is effectively infinity, resulting in X = 0 for this row.
+                    oX(iRowIndex1) = (uDiagonal > uEPSILON) || (uDiagonal < -uEPSILON) ? oX(iRowIndex1) / uDiagonal : T{};
+                }
+
+                // Apply column permutations to X using Q to get Solution
+                for (iRowIndex1 = 0; iRowIndex1 < iNumRows; ++iRowIndex1) {
+                    oSolution(m_oQ(iRowIndex1)) = oX(iRowIndex1);
+                }
+
+#ifdef MATRIX_PRINT
+                std::cout << "X Vector:" << std::endl;
+                std::cout << oX.getMatrixString();
+                std::cout << "Y Vector:" << std::endl;
+                std::cout << oY.getMatrixString();
+                std::cout << "B Permuted Vector:" << std::endl;
+                std::cout << oB_Permuted.getMatrixString();
+#endif
+
+                return oSolution;
+            }
+
+            #pragma endregion
+
+        private:
+
+            #pragma region Members
+
+            Matrix<T> m_oA; //Matrix to decompose
+            Matrix<T> m_oL; //Lower triangular matrix
+            Matrix<T> m_oU; //Upper triangular matrix
+            Matrix<size_t> m_oP; //Row permuation matrix
+            Matrix<size_t> m_oQ; //Column permutation matrix
+
+            #pragma endregion
+
+            #pragma region Functions
+
+            void runPLU_Factorization() {
+                size_t iNumRows = m_oA.getNumRows();
+                size_t iRowIndex1;
+                size_t iRowIndex2;
+                size_t iRowIndex3;
+                size_t iMaxRow;
+                size_t imaxColumn;
+                T uAbsoluteValue;
+                T uMaxValue;
+
+                //Initialize L to an identity matrix
+                for (size_t iRowIndex1 = 0; iRowIndex1 < iNumRows; ++iRowIndex1) {
+                    m_oL(iRowIndex1, iRowIndex1) = 1;
+                }
+
+                for (iRowIndex1 = 0; iRowIndex1 < iNumRows; ++iRowIndex1) {
+                    m_oP(iRowIndex1, 0) = m_oQ(iRowIndex1, 0) = iRowIndex1;
+                }
+
+                for (iRowIndex3 = 0; iRowIndex3 < iNumRows; ++iRowIndex3) {
+                    // Find the pivot (maximum element) in the submatrix U[iRowIndex3:iNumRows][iRowIndex3:iNumRows]
+                    uMaxValue = T{};
+                    iMaxRow = iRowIndex3;
+                    imaxColumn = iRowIndex3;
+                    for (iRowIndex1 = iRowIndex3; iRowIndex1 < iNumRows; ++iRowIndex1) {
+                        for (iRowIndex2 = iRowIndex3; iRowIndex2 < iNumRows; ++iRowIndex2) {
+                            uAbsoluteValue = (m_oU(iRowIndex1, iRowIndex2) < 0) ? -m_oU(iRowIndex1, iRowIndex2) : m_oU(iRowIndex1, iRowIndex2);
+                            if (uAbsoluteValue > uMaxValue) {
+                                uMaxValue = uAbsoluteValue;
+                                iMaxRow = iRowIndex1;
+                                imaxColumn = iRowIndex2;
+                            }
+                        }
+                    }
+
+                    // Swap rows in U to move the pivot to position (iRowIndex3, iRowIndex3)
+                    m_oU.swapRows(iRowIndex3, iMaxRow);
+                    m_oP.swapRows(iRowIndex3, iMaxRow);
+
+                    // Swap columns in U to move the pivot to position (iRowIndex3, iRowIndex3)
+                    for (iRowIndex1 = 0; iRowIndex1 < iNumRows; ++iRowIndex1) {
+                        m_oU.swapValues(iRowIndex1, iRowIndex3, iRowIndex1, imaxColumn);
+                    }
+
+                    m_oQ.swapRows(iRowIndex3, imaxColumn);
+
+                    // Update L for the row swaps
+                    for (iRowIndex1 = 0; iRowIndex1 < iRowIndex3; ++iRowIndex1) {
+                        m_oL.swapValues(iRowIndex3, iRowIndex1, iMaxRow, iRowIndex1);
+                    }
+
+                    // Compute multipliers and update U
+                    for (iRowIndex1 = iRowIndex3 + 1; iRowIndex1 < iNumRows; ++iRowIndex1) {
+                        m_oL(iRowIndex1, iRowIndex3) = m_oU(iRowIndex1, iRowIndex3) / m_oU(iRowIndex3, iRowIndex3);
+                        for (iRowIndex2 = iRowIndex3 + 1; iRowIndex2 < iNumRows; ++iRowIndex2) {
+                            m_oU(iRowIndex1, iRowIndex2) = m_oU(iRowIndex1, iRowIndex2) - m_oL(iRowIndex1, iRowIndex3) * m_oU(iRowIndex3, iRowIndex2);
+                        }
+                        m_oU(iRowIndex1, iRowIndex3) = T{};
+                    }
+                }
+            }
+
+            #pragma endregion
+    };
+
 }

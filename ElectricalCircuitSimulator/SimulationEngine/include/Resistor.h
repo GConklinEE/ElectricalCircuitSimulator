@@ -1,5 +1,4 @@
-#ifndef RESISTOR_H
-#define RESISTOR_H
+#pragma once
 
 #include "CircuitComponent.h"
 
@@ -21,5 +20,3 @@ namespace SimulationEngine {
     };
 
 }
-
-#endif
