@@ -1,5 +1,4 @@
-#ifndef GROUNDED_VOLTAGE_SOURCE_H
-#define GROUNDED_VOLTAGE_SOURCE_H
+#pragma once
 
 #include "CircuitComponent.h"
 
@@ -11,11 +10,11 @@ namespace SimulationEngine {
 
             GroundedVoltageSource(const size_t iNodeS, const size_t iNodeD, const double dVoltage, const double dResistance); // iNodeS is assumed to be ground
 
-            void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
-            void step(Matrix& oSourceVector);
-            void postStep(Matrix& oVoltageMatrix);
-            void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
-            void applySourceVectorMatrixStamp(Matrix& oSourceVector);
+            void initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep);
+            void step(Matrix<double>& oSourceVector);
+            void postStep(Matrix<double>& oVoltageMatrix);
+            void applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep);
+            void applySourceVectorMatrixStamp(Matrix<double>& oSourceVector);
 
         private:
 
@@ -24,5 +23,3 @@ namespace SimulationEngine {
     };
 
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef INDUCTOR_H
-#define INDUCTOR_H
+#pragma once
 
 #include "CircuitComponent.h"
 
@@ -11,11 +10,11 @@ namespace SimulationEngine {
 
             Inductor(const size_t iNodeS, const size_t iNodeD, const double m_dInductance);
 
-            void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
-            void step(Matrix& oSourceVector); // Trapezoidal integration
-            void postStep(Matrix& oVoltageMatrix);
-            void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
-            void applySourceVectorMatrixStamp(Matrix& oSourceVector);
+            void initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep);
+            void step(Matrix<double>& oSourceVector); // Trapezoidal integration
+            void postStep(Matrix<double>& oVoltageMatrix);
+            void applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep);
+            void applySourceVectorMatrixStamp(Matrix<double>& oSourceVector);
 
         private:
 
@@ -24,5 +23,3 @@ namespace SimulationEngine {
     };
 
 }
-
-#endif

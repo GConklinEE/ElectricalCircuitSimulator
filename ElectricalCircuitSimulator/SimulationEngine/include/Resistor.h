@@ -1,5 +1,4 @@
-#ifndef RESISTOR_H
-#define RESISTOR_H
+#pragma once
 
 #include "CircuitComponent.h"
 
@@ -11,9 +10,9 @@ namespace SimulationEngine {
 
             Resistor(const size_t iNodeS, const size_t iNodeD, const double dResistance);
 
-            void initalize(Matrix& oConductanceMatrix, const double dTimeStep);
-            void postStep(Matrix& oVoltageMatrix);
-            void applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep);
+            void initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep);
+            void postStep(Matrix<double>& oVoltageMatrix);
+            void applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep);
 
         private:
 
@@ -21,5 +20,3 @@ namespace SimulationEngine {
     };
 
 }
-
-#endif

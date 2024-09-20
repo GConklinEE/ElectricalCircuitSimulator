@@ -11,6 +11,7 @@
 // iNodeS is assumed to be (+), iNodeD is assumed to be (-).
 
 #include "Inductor.h"
+#include <iostream>
 
 using std::cout;
 using std::endl;
@@ -20,22 +21,22 @@ namespace SimulationEngine {
 
     Inductor::Inductor(const size_t iNodeS, const size_t iNodeD, const double dInductance) :
         CircuitComponent(iNodeS, iNodeD, false),
+        m_dInductance(dInductance),
         m_dVoltageDelta(0)
     {
         if (dInductance <= 0) {
             cout << "Inductance value must be greater than 0!" << endl;
             throw invalid_argument("Inductance value must be greater than 0!");
         }
-        m_dInductance = dInductance;
     }
 
-    void Inductor::initalize(Matrix& oConductanceMatrix, const double dTimeStep) {
+    void Inductor::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
         m_dCurrent = 0;
         m_dVoltageDelta = 0;
         applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
     }
 
-    void Inductor::applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep) {
+    void Inductor::applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
         double dResistance;
 
         m_dComponentResistanceStamp = dTimeStep / (2.0 * m_dInductance);
@@ -53,7 +54,7 @@ namespace SimulationEngine {
         oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentResistanceStamp;
     };
 
-    void Inductor::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
+    void Inductor::applySourceVectorMatrixStamp(Matrix<double>& oSourceVector) {
         double dCurrent;
 
         m_dCurrent = m_dComponentResistanceStamp * m_dVoltageDelta + m_dCurrent; // dt/2L*v(t-1) + i(t-1)
@@ -65,11 +66,11 @@ namespace SimulationEngine {
         oSourceVector(m_iNodeD, 0) = dCurrent + m_dCurrent;
     };
 
-    void Inductor::step(Matrix& oSourceVector) { // Trapezoidal integration
+    void Inductor::step(Matrix<double>& oSourceVector) { // Trapezoidal integration
         applySourceVectorMatrixStamp(oSourceVector);
     }
 
-    void Inductor::postStep(Matrix& oVoltageMatrix) {
+    void Inductor::postStep(Matrix<double>& oVoltageMatrix) {
         m_dVoltageDelta = (oVoltageMatrix(m_iNodeS, 0) - oVoltageMatrix(m_iNodeD, 0));
         m_dCurrent = m_dComponentResistanceStamp * m_dVoltageDelta + m_dCurrent; // i(t) = dt/2L*v(t) + dt/2L*v(t-1) + i(t-1), m_dCurrent = dt/2L*v(t-1) + i(t-1)
     }

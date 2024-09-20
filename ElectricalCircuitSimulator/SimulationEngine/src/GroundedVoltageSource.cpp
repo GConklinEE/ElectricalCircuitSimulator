@@ -10,6 +10,7 @@
 // iNodeS is assumed to be ground (-), iNodeD is assumed to be (+).
 
 #include "GroundedVoltageSource.h"
+#include <iostream>
 
 using std::cout;
 using std::endl;
@@ -18,7 +19,10 @@ using std::invalid_argument;
 namespace SimulationEngine {
 
     GroundedVoltageSource::GroundedVoltageSource(const size_t iNodeS, const size_t iNodeD, const double dVoltage, const double dResistance) :
-        CircuitComponent(iNodeS, iNodeD, true) {
+        CircuitComponent(iNodeS, iNodeD, true),
+        m_dVoltage(dVoltage),
+        m_dResistance(dResistance)
+    {
         if (dResistance <= 0) {
             cout << "Resistance value must be greater than 0!" << endl;
             throw invalid_argument("Resistance value must be greater than 0!");
@@ -27,16 +31,14 @@ namespace SimulationEngine {
             cout << "Voltage value must be greater than 0!" << endl;
             throw invalid_argument("Voltage value must be greater than 0!");
         }
-        m_dVoltage = dVoltage;
-        m_dResistance = dResistance;
     }
 
-    void GroundedVoltageSource::initalize(Matrix& oConductanceMatrix, const double dTimeStep) {
+    void GroundedVoltageSource::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
         m_dCurrent = 0;
         applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
     }
 
-    void GroundedVoltageSource::applyConductanceMatrixStamp(Matrix& oConductanceMatrix, const double dTimeStep) {
+    void GroundedVoltageSource::applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
         double dResistance;
 
         m_dComponentResistanceStamp = 1.0 / m_dResistance;
@@ -54,7 +56,7 @@ namespace SimulationEngine {
         oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentResistanceStamp;
     };
 
-    void GroundedVoltageSource::applySourceVectorMatrixStamp(Matrix& oSourceVector) {
+    void GroundedVoltageSource::applySourceVectorMatrixStamp(Matrix<double>& oSourceVector) {
         double dCurrent;
         double dComponentCurrentStamp;
 
@@ -67,11 +69,11 @@ namespace SimulationEngine {
         oSourceVector(m_iNodeD, 0) = dCurrent + dComponentCurrentStamp;
     };
 
-    void GroundedVoltageSource::step(Matrix& oSourceVector) {
+    void GroundedVoltageSource::step(Matrix<double>& oSourceVector) {
         applySourceVectorMatrixStamp(oSourceVector);
     }
 
-    void GroundedVoltageSource::postStep(Matrix& oVoltageMatrix) {
+    void GroundedVoltageSource::postStep(Matrix<double>& oVoltageMatrix) {
         m_dCurrent = (m_dVoltage - (oVoltageMatrix(m_iNodeD, 0) - oVoltageMatrix(m_iNodeS, 0))) / m_dResistance;
     }
 

@@ -7,6 +7,12 @@
 #include "LinearCircuit.h"
 #include "Matrix.h"
 #include "Resistor.h"
+#include <iostream>
+
+using namespace System;
+using namespace SimulationEngine;
+
+using std::make_unique;
 
 namespace SimulationEngineWrapper {
 
@@ -40,34 +46,34 @@ namespace SimulationEngineWrapper {
 
     };
         
-    public ref class PLU_Factorization : ManagedObject<SimulationEngine::PLU_Factorization> {
+    public ref class PLU_Factorization : ManagedObject<SimulationEngine::PLU_Factorization<double>> {
 
         public:
 
             PLU_Factorization() :
-                ManagedObject(new SimulationEngine::PLU_Factorization()) { ; }
+                ManagedObject(new SimulationEngine::PLU_Factorization<double>()) { ; }
     };
 
-    public ref class Matrix : ManagedObject<SimulationEngine::Matrix> {
+    public ref class Matrix : ManagedObject<SimulationEngine::Matrix<double>> {
 
         public:
 
             Matrix() :
-                ManagedObject(new SimulationEngine::Matrix()) { ; }
+                ManagedObject(new SimulationEngine::Matrix<double>()) { ; }
             Matrix(const int iRows, const int iColumns) :
-                ManagedObject(new SimulationEngine::Matrix(iRows, iColumns)) { ; }
+                ManagedObject(new SimulationEngine::Matrix<double>(iRows, iColumns)) { ; }
 
             int getNumRows() { 
-                return (int)(m_pInstance->getNumRows());
+                return static_cast<int>(m_pInstance->getNumRows());
             }
             int getNumColumns() {
-                return (int)(m_pInstance->getNumRows());
+                return static_cast<int>(m_pInstance->getNumRows());
             }
             double getValue(const int iRow, const int iColumn) {
-                return m_pInstance->getValue(iRow, iColumn);
+                return (*m_pInstance)(iRow, iColumn);
             }
             void setValue(const int iRow, const int iColumn, const double dValue) {
-                m_pInstance->setValue(iRow, iColumn, dValue);
+                (*m_pInstance)(iRow, iColumn) = dValue;
             }
             void swapRows(const int iRow1, const int iRow2) {
                 m_pInstance->swapRows(iRow1, iRow2);
@@ -79,7 +85,7 @@ namespace SimulationEngineWrapper {
                 m_pInstance->clear();
             }
             void printMatrix() {
-                m_pInstance->printMatrix();
+                std::cout << m_pInstance->getMatrixString();
             }
     };
 
@@ -102,10 +108,10 @@ namespace SimulationEngineWrapper {
                 return m_pInstance->getIsGround();
             }
             int getNodeS() {
-                return (int)(m_pInstance->getNodeS());
+                return static_cast<int>(m_pInstance->getNodeS());
             }
             int getNodeD() {
-                return (int)(m_pInstance->getNodeD());
+                return static_cast<int>(m_pInstance->getNodeD());
             }
             double getCurrent() {
                 return m_pInstance->getCurrent();
@@ -136,16 +142,16 @@ namespace SimulationEngineWrapper {
                 ManagedObject(new SimulationEngine::LinearCircuit(iNumComponents)) { ; }
 
             int addResistor(const int iNodeS, const int iNodeD, const double dResistance) {
-                return (int)(m_pInstance->addComponent(std::make_unique<SimulationEngine::Resistor>(iNodeS, iNodeD, dResistance)));
+                return static_cast<int>(m_pInstance->addComponent(make_unique<SimulationEngine::Resistor>(iNodeS, iNodeD, dResistance)));
             }
             int addInductor(const int iNodeS, const int iNodeD, const double dInductance) {
-                return (int)(m_pInstance->addComponent(std::make_unique<SimulationEngine::Inductor>(iNodeS, iNodeD, dInductance)));
+                return static_cast<int>(m_pInstance->addComponent(make_unique<SimulationEngine::Inductor>(iNodeS, iNodeD, dInductance)));
             }
             int addCapacitor(const int iNodeS, const int iNodeD, const double dCapacitance) {
-                return (int)(m_pInstance->addComponent(std::make_unique<SimulationEngine::Capacitor>(iNodeS, iNodeD, dCapacitance)));
+                return static_cast<int>(m_pInstance->addComponent(make_unique<SimulationEngine::Capacitor>(iNodeS, iNodeD, dCapacitance)));
             }
             int addGroundedVoltageSource(const int iNodeS, const int iNodeD, const double dVoltage, const double dResistance) {
-                return (int)(m_pInstance->addComponent(std::make_unique<SimulationEngine::GroundedVoltageSource>(iNodeS, iNodeD, dVoltage, dResistance)));
+                return static_cast<int>(m_pInstance->addComponent(make_unique<SimulationEngine::GroundedVoltageSource>(iNodeS, iNodeD, dVoltage, dResistance)));
             }
             void setStopTime(const double dStopTime) {
                 m_pInstance->setStopTime(dStopTime);

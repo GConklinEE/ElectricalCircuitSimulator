@@ -1,7 +1,7 @@
-#ifndef LINEARCIRCUIT_H
-#define LINEARCIRCUIT_H
+#pragma once
 
 #include "CircuitComponent.h"
+#include "PLU_Factorization.h"
 #include <vector>
 
 namespace SimulationEngine {
@@ -23,14 +23,6 @@ namespace SimulationEngine {
 
         private:
 
-            void solver();
-
-            std::unique_ptr<std::unique_ptr<CircuitComponent>[]> m_pCircuitComponents;
-            std::unique_ptr<Matrix> m_pConductanceMatrix;
-            std::unique_ptr<Matrix> m_pSourceVector;
-            std::unique_ptr<Matrix> m_pVoltageVector;
-            std::unique_ptr<PLU_Factorization> m_pPLU;
-            std::vector<size_t> m_oNodeList;
             size_t m_iMaxComponentCount;
             size_t m_iComponentCount;
             size_t m_iMaxNode;
@@ -41,8 +33,12 @@ namespace SimulationEngine {
             bool m_bHasGround;
             bool m_bInitSim;
             bool m_bRunSim;
+            std::unique_ptr<std::unique_ptr<CircuitComponent>[]> m_pCircuitComponents;
+            Matrix<double> m_oConductanceMatrix;
+            Matrix<double> m_oSourceVector;
+            Matrix<double> m_oVoltageVector;
+            PLU_Factorization<double> m_oPLU;
+            std::vector<size_t> m_oNodeList;
     };
 
 }
-
-#endif
