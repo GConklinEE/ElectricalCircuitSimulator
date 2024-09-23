@@ -17,6 +17,7 @@
     <ClInclude Include="include\Inductor.h" />
     <ClInclude Include="include\LinearCircuit.h" />
     <ClInclude Include="include\Matrix.h" />
+    <ClInclude Include="include\PLU_Factorization.h" />
     <ClInclude Include="include\Resistor.h" />
   </ItemGroup>
   <ItemGroup>
@@ -25,7 +26,6 @@
     <ClCompile Include="src\GroundedVoltageSource.cpp" />
     <ClCompile Include="src\Inductor.cpp" />
     <ClCompile Include="src\LinearCircuit.cpp" />
-    <ClCompile Include="src\Matrix.cpp" />
     <ClCompile Include="src\Resistor.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -71,6 +71,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>$(ProjectDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -89,6 +90,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

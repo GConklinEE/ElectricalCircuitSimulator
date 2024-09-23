@@ -32,6 +32,9 @@
     <ClInclude Include="include\Resistor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PLU_Factorization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Resistor.cpp">
@@ -50,9 +53,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\LinearCircuit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Matrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

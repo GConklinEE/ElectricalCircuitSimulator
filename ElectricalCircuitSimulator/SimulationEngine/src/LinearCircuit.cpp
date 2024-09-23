@@ -1,47 +1,40 @@
 #include "LinearCircuit.h"
+#include <iostream>
 
 using std::cout;
 using std::endl;
 using std::invalid_argument;
 using std::exception;
+using std::move;
+using std::vector;
+using std::unique_ptr;
+using std::make_unique;
 
 namespace SimulationEngine {
 
-    LinearCircuit::LinearCircuit(const int iNumComponents) {
+    LinearCircuit::LinearCircuit(const size_t iNumComponents) :
+        m_iMaxComponentCount(iNumComponents),
+        m_iComponentCount(0),
+        m_iMaxNode(0),
+        m_iGroundNode(0),
+        m_dStopTime(0),
+        m_dTimeStep(0),
+        m_dTime(0),
+        m_bHasGround(false),
+        m_bInitSim(false),
+        m_bRunSim(false),
+        m_pCircuitComponents(make_unique<unique_ptr<CircuitComponent>[]>(m_iMaxComponentCount))
+    {
         if (iNumComponents <= 0) {
             cout << "Circuit must have a positive and non-zero number of components!" << endl;
             throw exception("Circuit must have a positive and non-zero number of components!");
         }
-        m_iMaxComponentCount = iNumComponents;
-        m_pCircuitComponents = new CircuitComponent*[m_iMaxComponentCount]; // We have to use statically allocated arrays of objects due to using the C++ CLI/CLR
-        m_pConductanceMatrix = new Matrix();
-        m_pSourceVector = new Matrix();
-        m_pVoltageMatrix = new Matrix();
-        m_pPLU_Factorization = new PLU_Factorization();
-        m_oNodeList = vector<int>(0);
-        m_bHasGround = false;
-        m_iComponentCount = 0;
-        m_iMaxNode = 0;
-        m_iGroundNode = 0;
-        m_dStopTime = 0;
-        m_dTimeStep = 0;
-        m_dTime = 0;
-        m_bInitSim = false;
-        m_bRunSim = false;
     }
 
-    LinearCircuit::~LinearCircuit() {
-        delete[] m_pCircuitComponents;
-        delete m_pConductanceMatrix;
-        delete m_pSourceVector;
-        delete m_pVoltageMatrix;
-        delete m_pPLU_Factorization;
-    }
-
-    int LinearCircuit::addComponent(CircuitComponent* pCircuitComponent) {
-        int iNodeIterator;
-        int iNodeS = pCircuitComponent->getNodeS();
-        int iNodeD = pCircuitComponent->getNodeD();
+    size_t LinearCircuit::addComponent(unique_ptr<CircuitComponent> pCircuitComponent) {
+        size_t iNodeIterator;
+        size_t iNodeS = pCircuitComponent->getNodeS();
+        size_t iNodeD = pCircuitComponent->getNodeD();
         bool bFoundNodeS = false;
         bool bFoundNodeD = false;
 
@@ -60,10 +53,10 @@ namespace SimulationEngine {
                 m_bHasGround = true;
                 m_iGroundNode = pCircuitComponent->getNodeS();
             }
-            m_pCircuitComponents[m_iComponentCount] = pCircuitComponent;
+            m_pCircuitComponents[m_iComponentCount] = move(pCircuitComponent);
             m_iComponentCount++;
         }
-        for (iNodeIterator = 0; iNodeIterator < (int)m_oNodeList.size(); iNodeIterator++) {
+        for (iNodeIterator = 0; iNodeIterator < static_cast<int>(m_oNodeList.size()); iNodeIterator++) {
             if (!bFoundNodeS && (iNodeS == m_oNodeList[iNodeIterator])) {
                 bFoundNodeS = true;
             }
@@ -109,11 +102,7 @@ namespace SimulationEngine {
         return m_dTime;
     }
 
-    double LinearCircuit::getVoltage(const int iNode) const {
-        if (iNode < 0) {
-            cout << "Node values must be greater than or equal to 0!" << endl;
-            throw invalid_argument("Node values must be greater than or equal to 0!");
-        }
+    double LinearCircuit::getVoltage(const size_t iNode) const {
         if (iNode > m_iMaxNode) {
             cout << "Requested node does not exist!" << endl;
             throw invalid_argument("Requested node does not exist!");
@@ -123,10 +112,10 @@ namespace SimulationEngine {
             throw exception("Cannot read voltages from a circuit that has not been simulated!");
         }
 
-        return m_pVoltageMatrix->getValue(iNode, 0);
+        return m_oVoltageVector(iNode, 0);
     }
 
-    double LinearCircuit::getCurrent(const int iComponentIndex) const {
+    double LinearCircuit::getCurrent(const size_t iComponentIndex) const {
         if (iComponentIndex >= m_iComponentCount) {
             cout << "Requested component does not exist!" << endl;
             throw invalid_argument("Requested component does not exist!");
@@ -140,8 +129,8 @@ namespace SimulationEngine {
     }
 
     void LinearCircuit::initalize() {
-        int iIterator;
-        int iNode;
+        size_t iIterator;
+        size_t iNode;
         bool bFoundIndex;
 
         // Check for valid time step and stop time. Check that there are actually nodes in the circuit to simulate. Check that a ground exists.
@@ -173,33 +162,33 @@ namespace SimulationEngine {
         }
 
         // Declare blank matrices.
-        m_pConductanceMatrix = new Matrix(m_iMaxNode + 1, m_iMaxNode + 1);
-        m_pSourceVector = new Matrix(m_iMaxNode + 1, 1);
-        m_pVoltageMatrix = new Matrix(m_iMaxNode + 1, 1);
+        m_oConductanceMatrix = Matrix<double>(m_iMaxNode + 1, m_iMaxNode + 1);
+        m_oSourceVector = Matrix<double>(m_iMaxNode + 1, 1);
+        m_oVoltageVector = Matrix<double>(m_iMaxNode + 1, 1);
 
         // Build the conductance and initial source vector matrices
         for (iIterator = 0; iIterator < m_iComponentCount; iIterator++) {
-            m_pCircuitComponents[iIterator]->initalize(*m_pConductanceMatrix, m_dTimeStep);
+            m_pCircuitComponents[iIterator]->initalize(m_oConductanceMatrix, m_dTimeStep);
         }
 
         // Factor the conductance matrix
-        m_pPLU_Factorization = m_pConductanceMatrix->runPLU_Factorization();
+        m_oPLU = PLU_Factorization<double>(m_oConductanceMatrix);
 
 #ifdef MATRIX_PRINT
         // Print out the matrices
         cout << "Conductance Matrix:" << endl;
-        m_pConductanceMatrix->printMatrix();
+        cout << m_oConductanceMatrix.getMatrixString();
         cout << "Source Vector:" << endl;
-        m_pSourceVector->printMatrix();
+        cout << m_oSourceVector.getMatrixString();
         cout << "PLU Factorization Matrixes:" << endl;
         cout << "L:" << endl;
-        m_pPLU_Factorization->m_pL->printMatrix();
+        cout << m_oPLU.getL().getMatrixString();
         cout << "P:" << endl;
-        m_pPLU_Factorization->m_pP->printMatrix();
+        cout << m_oPLU.getP().getMatrixString();
         cout << "Q:" << endl;
-        m_pPLU_Factorization->m_pQ->printMatrix();
+        cout << m_oPLU.getQ().getMatrixString();
         cout << "U:" << endl;
-        m_pPLU_Factorization->m_pU->printMatrix();
+        cout << m_oPLU.getU().getMatrixString();
 #endif
 
         m_dTime = 0; // Set simulation time to zero
@@ -207,7 +196,7 @@ namespace SimulationEngine {
     }
 
     bool LinearCircuit::step() {
-        int iIterator;
+        size_t iIterator;
         double dNormalizationFactor;
 
         if (m_bInitSim == false) {
@@ -219,27 +208,27 @@ namespace SimulationEngine {
         cout << "**** Time: " << (m_dTime + m_dTimeStep) << " s ****\n" << endl;
 #endif
 
-        m_pSourceVector->clear(); // Is rebuilt every step
+        m_oSourceVector.clear(); // Is rebuilt every step
 
         // Run all component step functions
         for (iIterator = 0; iIterator < m_iComponentCount; iIterator++) {
-            m_pCircuitComponents[iIterator]->step(*m_pSourceVector);
+            m_pCircuitComponents[iIterator]->step(m_oSourceVector);
         }
 
         // Find the new voltage matrix
-        m_pVoltageMatrix = Matrix::linearSystemSolver(*m_pSourceVector, *m_pPLU_Factorization);
+        m_oVoltageVector = m_oPLU.solve(m_oSourceVector);
 
         // Check to see if the voltage matrix requires normalization
-        dNormalizationFactor = -m_pVoltageMatrix->getValue(m_iGroundNode, 0);
+        dNormalizationFactor = -m_oVoltageVector(m_iGroundNode);
         if (dNormalizationFactor != 0) {
             for (iIterator = 0; iIterator <= m_iMaxNode; iIterator++) {
-                m_pVoltageMatrix->setValue(iIterator, 0, (m_pVoltageMatrix->getValue(iIterator, 0) + dNormalizationFactor));
+                m_oVoltageVector(iIterator) = m_oVoltageVector(iIterator) + dNormalizationFactor;
             }
         }
 
         // Run all component post-step functions 
         for (iIterator = 0; iIterator < m_iComponentCount; iIterator++) {
-            m_pCircuitComponents[iIterator]->postStep(*m_pVoltageMatrix);
+            m_pCircuitComponents[iIterator]->postStep(m_oVoltageVector);
         }
 
         m_dTime += m_dTimeStep; // Update simulation runtime
@@ -247,9 +236,9 @@ namespace SimulationEngine {
 
 #ifdef MATRIX_PRINT
         cout << "Source Vector:" << endl;
-        m_pSourceVector->printMatrix();
+        cout << m_oSourceVector.getMatrixString();
         cout << "Voltage Matrix:" << endl;
-        m_pVoltageMatrix->printMatrix();
+        cout << m_oVoltageVector.getMatrixString();
 #endif
 
         if (m_dTime >= m_dStopTime)
