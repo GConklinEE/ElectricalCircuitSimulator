@@ -6,3 +6,4 @@ bin/
 x64/
 *.vcxproj.user
 *.orig
+/ElectricalCircuitSimulator/SimulationEngineBindingsC/ARM64/Debug
