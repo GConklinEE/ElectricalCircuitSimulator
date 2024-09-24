@@ -10,6 +10,12 @@
 // Post step calculates i(t) for the current step.
 // iNodeS is assumed to be (+), iNodeD is assumed to be (-).
 
+// AcrossReferenceNode = Circuit Ground
+// ComponentSimulationMatrixStamp = Component Resistance Matrix Stamp
+// applyThroughVectorMatrixStamp = Component Current Vector Stamp
+// Across = Voltage (V)
+// Through = Current (A)
+
 #include "Inductor.h"
 #include <iostream>
 
@@ -20,7 +26,7 @@ using std::invalid_argument;
 namespace SimulationEngine {
 
     Inductor::Inductor(const size_t iNodeS, const size_t iNodeD, const double dInductance) :
-        CircuitComponent(iNodeS, iNodeD, false),
+        LinearCircuitSimComponent(iNodeS, iNodeD, false),
         m_dInductance(dInductance),
         m_dVoltageDelta(0)
     {
@@ -30,49 +36,49 @@ namespace SimulationEngine {
         }
     }
 
-    void Inductor::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
-        m_dCurrent = 0;
+    void Inductor::LNS_initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
+        m_dThrough = 0;
         m_dVoltageDelta = 0;
-        applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
+        applySimulationMatrixStamp(oConductanceMatrix, dTimeStep);
     }
 
-    void Inductor::applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
+    void Inductor::applySimulationMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
         double dResistance;
 
-        m_dComponentResistanceStamp = dTimeStep / (2.0 * m_dInductance);
+        m_dComponentSimulationMatrixStamp = dTimeStep / (2.0 * m_dInductance);
 
         dResistance = oConductanceMatrix(m_iNodeS, m_iNodeS);
-        oConductanceMatrix(m_iNodeS, m_iNodeS) = dResistance + m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeS, m_iNodeS) = dResistance + m_dComponentSimulationMatrixStamp;
 
         dResistance = oConductanceMatrix(m_iNodeS, m_iNodeD);
-        oConductanceMatrix(m_iNodeS, m_iNodeD) = dResistance - m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeS, m_iNodeD) = dResistance - m_dComponentSimulationMatrixStamp;
 
         dResistance = oConductanceMatrix(m_iNodeD, m_iNodeS);
-        oConductanceMatrix(m_iNodeD, m_iNodeS) = dResistance - m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeD, m_iNodeS) = dResistance - m_dComponentSimulationMatrixStamp;
 
         dResistance = oConductanceMatrix(m_iNodeD, m_iNodeD);
-        oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentSimulationMatrixStamp;
     };
 
-    void Inductor::applySourceVectorMatrixStamp(Matrix<double>& oSourceVector) {
+    void Inductor::applyThroughVectorMatrixStamp(Matrix<double>& oSourceVector) {
         double dCurrent;
 
-        m_dCurrent = m_dComponentResistanceStamp * m_dVoltageDelta + m_dCurrent; // dt/2L*v(t-1) + i(t-1)
+        m_dThrough = m_dComponentSimulationMatrixStamp * m_dVoltageDelta + m_dThrough; // dt/2L*v(t-1) + i(t-1)
 
         dCurrent = oSourceVector(m_iNodeS, 0);
-        oSourceVector(m_iNodeS, 0) = dCurrent - m_dCurrent;
+        oSourceVector(m_iNodeS, 0) = dCurrent - m_dThrough;
 
         dCurrent = oSourceVector(m_iNodeD, 0);
-        oSourceVector(m_iNodeD, 0) = dCurrent + m_dCurrent;
+        oSourceVector(m_iNodeD, 0) = dCurrent + m_dThrough;
     };
 
-    void Inductor::step(Matrix<double>& oSourceVector) { // Trapezoidal integration
-        applySourceVectorMatrixStamp(oSourceVector);
+    void Inductor::LNS_step(Matrix<double>& oSourceVector) { // Trapezoidal integration
+        applyThroughVectorMatrixStamp(oSourceVector);
     }
 
-    void Inductor::postStep(Matrix<double>& oVoltageMatrix) {
+    void Inductor::LNS_postStep(Matrix<double>& oVoltageMatrix) {
         m_dVoltageDelta = (oVoltageMatrix(m_iNodeS, 0) - oVoltageMatrix(m_iNodeD, 0));
-        m_dCurrent = m_dComponentResistanceStamp * m_dVoltageDelta + m_dCurrent; // i(t) = dt/2L*v(t) + dt/2L*v(t-1) + i(t-1), m_dCurrent = dt/2L*v(t-1) + i(t-1)
+        m_dThrough = m_dComponentSimulationMatrixStamp * m_dVoltageDelta + m_dThrough; // i(t) = dt/2L*v(t) + dt/2L*v(t-1) + i(t-1), m_dThrough = dt/2L*v(t-1) + i(t-1)
     }
 
 }

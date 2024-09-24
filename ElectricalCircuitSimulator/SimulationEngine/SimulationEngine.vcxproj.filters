@@ -14,16 +14,13 @@
     <ClInclude Include="include\Capacitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CircuitComponent.h">
+    <ClInclude Include="include\Component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GroundedVoltageSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Inductor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\LinearCircuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Matrix.h">
@@ -35,6 +32,9 @@
     <ClInclude Include="include\PLU_Factorization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Simulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Resistor.cpp">
@@ -43,16 +43,13 @@
     <ClCompile Include="src\Capacitor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\CircuitComponent.cpp">
+    <ClCompile Include="src\Component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GroundedVoltageSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Inductor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LinearCircuit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

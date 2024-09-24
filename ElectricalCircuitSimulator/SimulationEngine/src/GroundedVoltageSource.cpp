@@ -9,6 +9,12 @@
 // Post step calculates i(t) for the current step.
 // iNodeS is assumed to be ground (-), iNodeD is assumed to be (+).
 
+// AcrossReferenceNode = Circuit Ground
+// ComponentSimulationMatrixStamp = Component Resistance Matrix Stamp
+// applyThroughVectorMatrixStamp = Component Current Vector Stamp
+// Across = Voltage (V)
+// Through = Current (A)
+
 #include "GroundedVoltageSource.h"
 #include <iostream>
 
@@ -19,7 +25,7 @@ using std::invalid_argument;
 namespace SimulationEngine {
 
     GroundedVoltageSource::GroundedVoltageSource(const size_t iNodeS, const size_t iNodeD, const double dVoltage, const double dResistance) :
-        CircuitComponent(iNodeS, iNodeD, true),
+        LinearCircuitSimComponent(iNodeS, iNodeD, true),
         m_dVoltage(dVoltage),
         m_dResistance(dResistance)
     {
@@ -33,30 +39,30 @@ namespace SimulationEngine {
         }
     }
 
-    void GroundedVoltageSource::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
-        m_dCurrent = 0;
-        applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
+    void GroundedVoltageSource::LNS_initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
+        m_dThrough = 0;
+        applySimulationMatrixStamp(oConductanceMatrix, dTimeStep);
     }
 
-    void GroundedVoltageSource::applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
+    void GroundedVoltageSource::applySimulationMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
         double dResistance;
 
-        m_dComponentResistanceStamp = 1.0 / m_dResistance;
+        m_dComponentSimulationMatrixStamp = 1.0 / m_dResistance;
 
         dResistance = oConductanceMatrix(m_iNodeS, m_iNodeS);
-        oConductanceMatrix(m_iNodeS, m_iNodeS) = dResistance + m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeS, m_iNodeS) = dResistance + m_dComponentSimulationMatrixStamp;
 
         dResistance = oConductanceMatrix(m_iNodeS, m_iNodeD);
-        oConductanceMatrix(m_iNodeS, m_iNodeD) = dResistance - m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeS, m_iNodeD) = dResistance - m_dComponentSimulationMatrixStamp;
 
         dResistance = oConductanceMatrix(m_iNodeD, m_iNodeS);
-        oConductanceMatrix(m_iNodeD, m_iNodeS) = dResistance - m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeD, m_iNodeS) = dResistance - m_dComponentSimulationMatrixStamp;
 
         dResistance = oConductanceMatrix(m_iNodeD, m_iNodeD);
-        oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentSimulationMatrixStamp;
     };
 
-    void GroundedVoltageSource::applySourceVectorMatrixStamp(Matrix<double>& oSourceVector) {
+    void GroundedVoltageSource::applyThroughVectorMatrixStamp(Matrix<double>& oSourceVector) {
         double dCurrent;
         double dComponentCurrentStamp;
 
@@ -69,12 +75,12 @@ namespace SimulationEngine {
         oSourceVector(m_iNodeD, 0) = dCurrent + dComponentCurrentStamp;
     };
 
-    void GroundedVoltageSource::step(Matrix<double>& oSourceVector) {
-        applySourceVectorMatrixStamp(oSourceVector);
+    void GroundedVoltageSource::LNS_step(Matrix<double>& oSourceVector) {
+        applyThroughVectorMatrixStamp(oSourceVector);
     }
 
-    void GroundedVoltageSource::postStep(Matrix<double>& oVoltageMatrix) {
-        m_dCurrent = (m_dVoltage - (oVoltageMatrix(m_iNodeD, 0) - oVoltageMatrix(m_iNodeS, 0))) / m_dResistance;
+    void GroundedVoltageSource::LNS_postStep(Matrix<double>& oVoltageMatrix) {
+        m_dThrough = (m_dVoltage - (oVoltageMatrix(m_iNodeD, 0) - oVoltageMatrix(m_iNodeS, 0))) / m_dResistance;
     }
 
 }
