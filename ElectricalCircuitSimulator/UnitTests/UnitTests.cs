@@ -222,18 +222,24 @@ namespace UnitTests
         [TestMethod]
         public void TestCircuitComponent()
         {
-            CircuitComponent oCircuitComponent;
+            LinearCircuitComponent oCircuitComponent;
 
-            AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(5, 5, false), "Expected 'Node values must not be the same!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oCircuitComponent = new CircuitComponent(0, 0, false), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
+            //AssertAction.VerifyAssert(() => oCircuitComponent = new LinearCircuitComponent()), "Expected 'Two node values must not be the same!' error, did not get it!");
 
-            oCircuitComponent = new CircuitComponent(0, 5, false);
-            Assert.IsTrue(oCircuitComponent.getIsGround() == false, "Incorrect value! Expected false");
-            Assert.IsTrue(oCircuitComponent.getNodeS() == 0, "Incorrect value! Expected 0");
-            Assert.IsTrue(oCircuitComponent.getNodeD() == 5, "Incorrect value! Expected 5");
+            oCircuitComponent = new LinearCircuitComponent(0, true, 1);
+            Assert.IsTrue(oCircuitComponent.getNumNodes() == 1, "Incorrect value! Expected 1");
+            Assert.IsTrue(oCircuitComponent.hasGroundNode() == true, "Incorrect value! Expected true");
+            Assert.IsTrue(oCircuitComponent.getGroundNode() == 1, "Incorrect value! Expected 1");
+            AssertAction.VerifyAssert(() => oCircuitComponent.getNode(1), "Expected 'Index is out of bounds!' error, did not get it!");
             Assert.IsTrue(oCircuitComponent.getCurrent() == 0, "Incorrect value! Expected 0");
+            oCircuitComponent.setNodeList(0b0011001000000001);
+            Assert.IsTrue(oCircuitComponent.getNumNodes() == 4, "Incorrect value! Expected 4");
+            Assert.IsTrue(oCircuitComponent.getNode(0) == 1, "Incorrect value! Expected 1");
+            Assert.IsTrue(oCircuitComponent.getNode(1) == 0, "Incorrect value! Expected 1");
+            Assert.IsTrue(oCircuitComponent.getNode(2) == 2, "Incorrect value! Expected 1");
+            Assert.IsTrue(oCircuitComponent.getNode(3) == 3, "Incorrect value! Expected 1");
 
-            oCircuitComponent = new CircuitComponent(2, 7, true); // Check for memory access problems
+            oCircuitComponent = new LinearCircuitComponent(0, false, 0); // Check for memory access problems
         }
 
         [TestMethod]
@@ -278,22 +284,21 @@ namespace UnitTests
             oLinearCircuit.addGroundedVoltageSource(1, 2, 30, 10);
             oLinearCircuit.addCapacitor(1, 0, 10);
             oLinearCircuit.addResistor(3, 2, 10);
-            AssertAction.VerifyAssert(() => oLinearCircuit.addGroundedVoltageSource(1, 2, 30, 10), "Expected 'Circuit already has a ground, cannot add another one!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.addGroundedVoltageSource(1, 2, 30, 10), "Expected 'Simulation already has an across reference node, cannot add another one!' error, did not get it!");
             oLinearCircuit.addInductor(4, 2, 10);
-            AssertAction.VerifyAssert(() => oLinearCircuit.addInductor(5, 2, 10), "Expected 'Circuit is already full of components!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.addInductor(5, 2, 10), "Expected 'Simulation is already full of components!' error, did not get it!");
             oLinearCircuit.setStopTime(10);
             AssertAction.VerifyAssert(() => oLinearCircuit.setStopTime(0), "Expected 'Stop time must be greater than 0!' error, did not get it!");
             oLinearCircuit.setTimeStep(1);
             AssertAction.VerifyAssert(() => oLinearCircuit.setTimeStep(0), "Expected 'Time step must be greater than 0!' error, did not get it!");
             Assert.IsTrue((int)Math.Round(oLinearCircuit.getTime()) == 0, "Incorrect time! Expected 0");
-            AssertAction.VerifyAssert(() => oLinearCircuit.step(), "Expected 'Circuit has not been initalized!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oLinearCircuit.getCurrent(0), "Expected 'Cannot read currents from a circuit that has not been simulated!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(2), "Expected 'Cannot read voltages from a circuit that has not been simulated!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.step(), "Expected 'Simulation has not been initalized!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.getCurrent(0), "Expected 'Cannot read through values from a simulation that has not been simulated!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(2), "Expected 'Cannot read across values from a simulation that has not been simulated!' error, did not get it!");
             oLinearCircuit.initalize();
             bDone = oLinearCircuit.step();
             iSteps++;
             AssertAction.VerifyAssert(() => oLinearCircuit.getCurrent(8), "Expected 'Requested component does not exist!' error, did not get it!");
-            AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(-6), "Expected 'Node values must be greater than or equal to 0!' error, did not get it!");
             AssertAction.VerifyAssert(() => oLinearCircuit.getVoltage(7), "Expected 'Requested node does not exist!' error, did not get it!");
             Assert.IsTrue(bDone == false, "Simulation is not supposed to be done on the first step!");
             do
@@ -304,20 +309,20 @@ namespace UnitTests
             while (bDone == false && iSteps < 20);
             Assert.IsTrue(iSteps == 10, "Simulation did not finish in the correct number of time steps!");
 
-            AssertAction.VerifyAssert(() => new LinearCircuit(-5), "Expected 'Circuit must have a positive and non-zero number of components!' error, did not get it!");
-            AssertAction.VerifyAssert(() => new LinearCircuit(0), "Expected 'Circuit must have a positive and non-zero number of components!' error, did not get it!");
+            AssertAction.VerifyAssert(() => new LinearCircuit(-5), "Expected 'Simulation must have a positive and non-zero number of components!' error, did not get it!");
+            AssertAction.VerifyAssert(() => new LinearCircuit(0), "Expected 'Simulation must have a positive and non-zero number of components!' error, did not get it!");
             oLinearCircuit = new LinearCircuit(4);
             oLinearCircuit.setStopTime(10);
             oLinearCircuit.setTimeStep(1);
-            AssertAction.VerifyAssert(() => oLinearCircuit.initalize(), "Expected 'There are no components in the circuit!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.initalize(), "Expected 'There are no components in the simulation!' error, did not get it!");
             oLinearCircuit.addResistor(0, 1, 10);
-            AssertAction.VerifyAssert(() => oLinearCircuit.initalize(), "Expected 'There is no ground in the circuit!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.initalize(), "Expected 'There is no across reference node in the simulation!' error, did not get it!");
             oLinearCircuit.addGroundedVoltageSource(0, 2, 10, 10);
             oLinearCircuit.setTimeStep(11);
             AssertAction.VerifyAssert(() => oLinearCircuit.initalize(), "Expected 'Stop time cannot be smaller than time step!' error, did not get it!");
             oLinearCircuit.setTimeStep(1);
             oLinearCircuit.addResistor(0, 6, 10);
-            AssertAction.VerifyAssert(() => oLinearCircuit.initalize(), "Expected 'Circuit nodes are not condensed into the smallest matrix possible!' error, did not get it!");
+            AssertAction.VerifyAssert(() => oLinearCircuit.initalize(), "Expected 'Simulation nodes are not condensed into the smallest number possible!' error, did not get it!");
 
             oLinearCircuit.Dispose();
         }

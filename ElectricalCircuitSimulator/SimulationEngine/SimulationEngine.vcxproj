@@ -12,20 +12,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Capacitor.h" />
-    <ClInclude Include="include\CircuitComponent.h" />
+    <ClInclude Include="include\Component.h" />
     <ClInclude Include="include\GroundedVoltageSource.h" />
     <ClInclude Include="include\Inductor.h" />
-    <ClInclude Include="include\LinearCircuit.h" />
     <ClInclude Include="include\Matrix.h" />
     <ClInclude Include="include\PLU_Factorization.h" />
     <ClInclude Include="include\Resistor.h" />
+    <ClInclude Include="include\Simulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Capacitor.cpp" />
-    <ClCompile Include="src\CircuitComponent.cpp" />
+    <ClCompile Include="src\Component.cpp" />
     <ClCompile Include="src\GroundedVoltageSource.cpp" />
     <ClCompile Include="src\Inductor.cpp" />
-    <ClCompile Include="src\LinearCircuit.cpp" />
     <ClCompile Include="src\Resistor.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

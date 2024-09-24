@@ -6,6 +6,12 @@
 // Conductance matrix stamp uses the 1/R term.
 // Post step calculates i(t) for the current step.
 
+// AcrossReferenceNode = Circuit Ground
+// ComponentSimulationMatrixStamp = Component Resistance Matrix Stamp
+// applyThroughVectorMatrixStamp = Component Current Vector Stamp
+// Across = Voltage (V)
+// Through = Current (A)
+
 #include "Resistor.h"
 #include <iostream>
 
@@ -16,40 +22,48 @@ using std::invalid_argument;
 namespace SimulationEngine {
 
     Resistor::Resistor(const size_t iNodeS, const size_t iNodeD, const double dResistance) :
-        CircuitComponent(iNodeS, iNodeD, false),
+        LinearCircuitSimComponent(0, false, iNodeS),
+        m_iNodeS(iNodeS),
+        m_iNodeD(iNodeD),
         m_dResistance(dResistance)
     {
+        size_t iNodeList = 0;
+
         if (dResistance <= 0) {
             cout << "Resistance value must be greater than 0!" << endl;
             throw invalid_argument("Resistance value must be greater than 0!");
         }
+
+        iNodeList += (m_iNodeS << (0 * BITS_PER_NODE));
+        iNodeList += (m_iNodeD << (1 * BITS_PER_NODE));
+        setNodeList(iNodeList);
     }
 
-    void Resistor::initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
-        m_dCurrent = 0;
-        applyConductanceMatrixStamp(oConductanceMatrix, dTimeStep);
+    void Resistor::LNS_initalize(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
+        m_dThrough = 0;
+        applySimulationMatrixStamp(oConductanceMatrix, dTimeStep);
     }
 
-    void Resistor::applyConductanceMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
+    void Resistor::applySimulationMatrixStamp(Matrix<double>& oConductanceMatrix, const double dTimeStep) {
         double dResistance;
 
-        m_dComponentResistanceStamp = 1.0 / m_dResistance;
+        m_dComponentSimulationMatrixStamp = 1.0 / m_dResistance;
 
         dResistance = oConductanceMatrix(m_iNodeS, m_iNodeS);
-        oConductanceMatrix(m_iNodeS, m_iNodeS) = dResistance + m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeS, m_iNodeS) = dResistance + m_dComponentSimulationMatrixStamp;
 
         dResistance = oConductanceMatrix(m_iNodeS, m_iNodeD);
-        oConductanceMatrix(m_iNodeS, m_iNodeD) = dResistance - m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeS, m_iNodeD) = dResistance - m_dComponentSimulationMatrixStamp;
 
         dResistance = oConductanceMatrix(m_iNodeD, m_iNodeS);
-        oConductanceMatrix(m_iNodeD, m_iNodeS) = dResistance - m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeD, m_iNodeS) = dResistance - m_dComponentSimulationMatrixStamp;
 
         dResistance = oConductanceMatrix(m_iNodeD, m_iNodeD);
-        oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentResistanceStamp;
+        oConductanceMatrix(m_iNodeD, m_iNodeD) = dResistance + m_dComponentSimulationMatrixStamp;
     };
 
-    void Resistor::postStep(Matrix<double>& oVoltageMatrix) {
-        m_dCurrent = (oVoltageMatrix(m_iNodeS, 0) - oVoltageMatrix(m_iNodeD, 0)) / m_dResistance;
+    void Resistor::LNS_postStep(Matrix<double>& oVoltageMatrix) {
+        m_dThrough = (oVoltageMatrix(m_iNodeS, 0) - oVoltageMatrix(m_iNodeD, 0)) / m_dResistance;
     }
 
 }
