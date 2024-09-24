@@ -10,7 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.IO;
 using System.Collections.ObjectModel;
-using SimulationEngineWrapper;
+using SimulationEngineBindingsCSharp;
 using OxyPlot.Axes;
 
 namespace ElectricalCircuitSimulator
@@ -112,11 +112,11 @@ namespace ElectricalCircuitSimulator
             int iLoadedFile = 0;
             int iComponent;
             int iComponents;
-            int[] iParamValue = new int[2];
+            nuint[] iParamValue = new nuint[2];
 
             m_oSimulations = new Collection<LinearCircuit>();
-            m_oVoltageScopeNodes = new Collection<int>();
-            m_oCurrentScopeComponents = new Collection<int>();
+            m_oVoltageScopeNodes = new Collection<nuint>();
+            m_oCurrentScopeComponents = new Collection<nuint>();
             m_oTimeSteps = new Collection<double>();
             m_oStopTimes = new Collection<double>();
 
@@ -171,7 +171,7 @@ namespace ElectricalCircuitSimulator
                     // Components
                     iLineIndex = FileConstants.HEADER_LINES;
                     iComponents = oTextLines.Count() - FileConstants.ALL_EXCEPT_COMPONENTS;
-                    oLinearCircuit = new LinearCircuit(iComponents);
+                    oLinearCircuit = new LinearCircuit((nuint)iComponents);
                     for (iComponent = (iLineIndex); iComponent < (iComponents + iLineIndex); iComponent++)
                     {
                         sName = oTextLines[iComponent].Split("(")[0];
@@ -179,16 +179,16 @@ namespace ElectricalCircuitSimulator
                         switch (sName)
                         {
                             case "Resistor":
-                                oLinearCircuit.addResistor(int.Parse(sComponentParams[0]), int.Parse(sComponentParams[1]), double.Parse(sComponentParams[2]));
+                                oLinearCircuit.AddResistor(nuint.Parse(sComponentParams[0]), nuint.Parse(sComponentParams[1]), double.Parse(sComponentParams[2]));
                                 break;
                             case "Capacitor":
-                                oLinearCircuit.addCapacitor(int.Parse(sComponentParams[0]), int.Parse(sComponentParams[1]), double.Parse(sComponentParams[2]));
+                                oLinearCircuit.AddCapacitor(nuint.Parse(sComponentParams[0]), nuint.Parse(sComponentParams[1]), double.Parse(sComponentParams[2]));
                                 break;
                             case "Inductor":
-                                oLinearCircuit.addInductor(int.Parse(sComponentParams[0]), int.Parse(sComponentParams[1]), double.Parse(sComponentParams[2]));
+                                oLinearCircuit.AddInductor(nuint.Parse(sComponentParams[0]), nuint.Parse(sComponentParams[1]), double.Parse(sComponentParams[2]));
                                 break;
                             case "GroundedVoltageSource":
-                                oLinearCircuit.addGroundedVoltageSource(int.Parse(sComponentParams[0]), int.Parse(sComponentParams[1]), double.Parse(sComponentParams[2]), double.Parse(sComponentParams[3]));
+                                oLinearCircuit.AddGroundedVoltageSource(nuint.Parse(sComponentParams[0]), nuint.Parse(sComponentParams[1]), double.Parse(sComponentParams[2]), double.Parse(sComponentParams[3]));
                                 break;
                             default:
                                 throw new Exception("Unknown circuit component type!");
@@ -198,7 +198,7 @@ namespace ElectricalCircuitSimulator
                     // Scopes
                     iLineIndex += iComponents;
                     sName = oTextLines[iLineIndex].Split("(")[0];
-                    iParamValue[0] = int.Parse(oTextLines[iLineIndex].Split("(")[1].Split(")")[0]);
+                    iParamValue[0] = nuint.Parse(oTextLines[iLineIndex].Split("(")[1].Split(")")[0]);
                     if (sName != "ScopeV")
                     {
                         throw new Exception("Error with voltage scope formatting!");
@@ -206,7 +206,7 @@ namespace ElectricalCircuitSimulator
 
                     iLineIndex += FileConstants.SCOPE_V_LINES;
                     sName = oTextLines[iLineIndex].Split("(")[0];
-                    iParamValue[1] = int.Parse(oTextLines[iLineIndex].Split("(")[1].Split(")")[0]);
+                    iParamValue[1] = nuint.Parse(oTextLines[iLineIndex].Split("(")[1].Split(")")[0]);
                     if (sName != "ScopeI")
                     {
                         throw new Exception("Error with current scope formatting!");
@@ -298,14 +298,15 @@ namespace ElectricalCircuitSimulator
 
             try
             {
-                bDone = m_oSimulations[m_oLastTextBlock.Index].step();
+                double time = m_oSimulations[m_oLastTextBlock.Index].GetTime();
+                bDone = m_oSimulations[m_oLastTextBlock.Index].Step();
                 if ((m_bTestMode == true) && (sender is IndexTextBlock)) // Unit test mode only
                 {
                     bDone = true;
                 }
 
-                m_oLineSeriesV.Points.Add(new DataPoint(m_oSimulations[m_oLastTextBlock.Index].getTime(), m_oSimulations[m_oLastTextBlock.Index].getVoltage(m_oVoltageScopeNodes[m_oLastTextBlock.Index])));
-                m_oLineSeriesI.Points.Add(new DataPoint(m_oSimulations[m_oLastTextBlock.Index].getTime(), m_oSimulations[m_oLastTextBlock.Index].getCurrent(m_oCurrentScopeComponents[m_oLastTextBlock.Index])));
+                m_oLineSeriesV.Points.Add(new DataPoint(m_oSimulations[m_oLastTextBlock.Index].GetTime(), m_oSimulations[m_oLastTextBlock.Index].GetVoltage(m_oVoltageScopeNodes[m_oLastTextBlock.Index])));
+                m_oLineSeriesI.Points.Add(new DataPoint(m_oSimulations[m_oLastTextBlock.Index].GetTime(), m_oSimulations[m_oLastTextBlock.Index].GetCurrent(m_oCurrentScopeComponents[m_oLastTextBlock.Index])));
 
                 // Refresh the plot
                 m_oPlotModel1.InvalidatePlot(true);
@@ -323,6 +324,7 @@ namespace ElectricalCircuitSimulator
 
             if (bDone == true)
             {
+                double time = m_oSimulations[m_oLastTextBlock.Index].GetTime();
                 xSimulateButton.Content = "Simulate Circuit";
                 m_oTimer.Stop();
             }
@@ -438,9 +440,9 @@ namespace ElectricalCircuitSimulator
                     try
                     {
                         // Setup simulation
-                        m_oSimulations[m_oLastTextBlock.Index].setStopTime(m_dStopTime);
-                        m_oSimulations[m_oLastTextBlock.Index].setTimeStep(m_dStepSize);
-                        m_oSimulations[m_oLastTextBlock.Index].initalize();
+                        m_oSimulations[m_oLastTextBlock.Index].SetStopTime(m_dStopTime);
+                        m_oSimulations[m_oLastTextBlock.Index].SetTimeStep(m_dStepSize);
+                        m_oSimulations[m_oLastTextBlock.Index].Initialize();
 
                         // Setup graphs
                         m_oLineSeriesV.Points.Clear();
@@ -489,8 +491,8 @@ namespace ElectricalCircuitSimulator
         private IndexTextBlock m_oLastTextBlock;
         private Collection<Image> m_oImages;
         private Collection<LinearCircuit> m_oSimulations;
-        private Collection<int> m_oVoltageScopeNodes;
-        private Collection<int> m_oCurrentScopeComponents;
+        private Collection<nuint> m_oVoltageScopeNodes;
+        private Collection<nuint> m_oCurrentScopeComponents;
         private Collection<double> m_oTimeSteps;
         private Collection<double> m_oStopTimes;
 

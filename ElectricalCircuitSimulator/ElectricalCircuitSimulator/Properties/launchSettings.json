@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ElectricalCircuitSimulator": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

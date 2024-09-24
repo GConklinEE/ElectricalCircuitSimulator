@@ -241,10 +241,7 @@ namespace SimulationEngine {
         cout << m_oVoltageVector.getMatrixString();
 #endif
 
-        if (m_dTime >= m_dStopTime)
-            return true; // Simulation is done
-        else
-            return false;
+        return m_dTime >= m_dStopTime;
     }
 
 }
