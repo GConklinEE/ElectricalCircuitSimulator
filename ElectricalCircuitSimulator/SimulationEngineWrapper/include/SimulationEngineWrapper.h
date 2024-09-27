@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Capacitor.h"
-#include "CircuitComponent.h"
+#include "Component.h"
 #include "GroundedVoltageSource.h"
 #include "Inductor.h"
-#include "LinearCircuit.h"
+#include "Simulation.h"
 #include "Matrix.h"
 #include "Resistor.h"
 #include <iostream>
@@ -97,21 +97,27 @@ namespace SimulationEngineWrapper {
                 ManagedObject(new SimulationEngine::Capacitor(iNodeS, iNodeD, m_dCapacitance)) { ; }
     };
 
-    public ref class CircuitComponent : ManagedObject<SimulationEngine::CircuitComponent> {
+    public ref class LinearCircuitComponent : ManagedObject<SimulationEngine::LinearCircuitSimComponent> {
 
         public:
 
-            CircuitComponent(const int iNodeS, const int iNodeD, bool bIsGround) :
-                ManagedObject(new SimulationEngine::CircuitComponent(iNodeS, iNodeD, bIsGround)) { ; }
+            LinearCircuitComponent(const int iNodeList, const bool bHasAcrossReferenceNode, const int iAcrossReferenceNode) :
+                ManagedObject(new SimulationEngine::LinearCircuitSimComponent(iNodeList, bHasAcrossReferenceNode, iAcrossReferenceNode)) { ; }
 
-            bool getIsGround() {
-                return m_pInstance->getIsGround();
+            int getNumNodes() {
+                return static_cast<int>(m_pInstance->getNumNodes());
             }
-            int getNodeS() {
-                return static_cast<int>(m_pInstance->getNodeS());
+            int getNode(const int iNodeIndex) {
+                return static_cast<int>(m_pInstance->getNode(iNodeIndex));
             }
-            int getNodeD() {
-                return static_cast<int>(m_pInstance->getNodeD());
+            void setNodeList(const int iNodeList) {
+                return m_pInstance->setNodeList(iNodeList);
+            }
+            bool hasGroundNode() {
+                return m_pInstance->hasGroundNode();
+            }
+            int getGroundNode() {
+                return static_cast<int>(m_pInstance->getGroundNode());
             }
             double getCurrent() {
                 return m_pInstance->getCurrent();
@@ -134,12 +140,12 @@ namespace SimulationEngineWrapper {
                 ManagedObject(new SimulationEngine::Inductor(iNodeS, iNodeD, m_dInductance)) { ; }
     };
         
-    public ref class LinearCircuit : ManagedObject<SimulationEngine::LinearCircuit> {
+    public ref class LinearCircuit : ManagedObject<SimulationEngine::LinearCircuitSimulationCC> {
 
         public:
 
             LinearCircuit(const int iNumComponents) :
-                ManagedObject(new SimulationEngine::LinearCircuit(iNumComponents)) { ; }
+                ManagedObject(new SimulationEngine::LinearCircuitSimulationCC(iNumComponents)) { ; }
 
             int addResistor(const int iNodeS, const int iNodeD, const double dResistance) {
                 return static_cast<int>(m_pInstance->addComponent(make_unique<SimulationEngine::Resistor>(iNodeS, iNodeD, dResistance)));
@@ -169,7 +175,7 @@ namespace SimulationEngineWrapper {
                 return m_pInstance->getCurrent(iComponentIndex);
             }
             void initalize() {
-                m_pInstance->initalize();
+                m_pInstance->initalize(true);
             }
             bool step() {
                 return m_pInstance->step();
